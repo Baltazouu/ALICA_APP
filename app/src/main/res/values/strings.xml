@@ -4,4 +4,13 @@
     <string name="title_home">Home</string>
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
+    <string name="title_offer_creation">Créer votre offre</string>
+    <string name="entitled_offer">Intitulé</string>
+    <string name="description_offer">Descriptif rapide de la mission</string>
+    <string name="city_offer">Ville</string>
+    <string name="job_description_offer">Descriptif du poste</string>
+    <string name="seek_job_offer">Poste recherché</string>
+    <string name="experience_offer">Experience</string>
+    <string name="studies_level_offer">Niceau d étude</string>
+
 </resources>
