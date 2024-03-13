@@ -10,6 +10,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.example.alica_app.ui.connexion.ConnectionScreen
 import com.example.alica_app.ui.home.NavBar
 import com.example.alica_app.ui.theme.ALICA_APPTheme
 
@@ -18,7 +19,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             ALICA_APPTheme {
-                NavBar()
+                ConnectionScreen()
             }
         }
     }
