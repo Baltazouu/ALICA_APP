@@ -1,6 +1,5 @@
 package com.example.alica_app.ui.SignUp
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.width
@@ -29,22 +28,19 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import coil.compose.AsyncImage
 import com.example.alica_app.ui.signIn.BackgroundImageWithTitle
-import org.w3c.dom.Text
 
 
 @Composable
 @Preview
-fun SignUpScreen() {
+fun SignUpScreen(
+    viewModel: ViewModelSignUp = ViewModelSignUp()
+) {
 
      var firstName by remember { mutableStateOf("") }
      var lastName by remember { mutableStateOf("") }
      var emailAddress by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
-
-
+     var password by remember { mutableStateOf("") }
 
     LazyColumn(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(15.dp)) {
 
@@ -68,6 +64,8 @@ fun SignUpScreen() {
             SignupButtonComponent();
         }
     }
+
+    ViewModelSignUp().signUp(firstName, lastName, emailAddress, password)
 }
 
 
