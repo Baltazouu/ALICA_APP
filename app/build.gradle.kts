@@ -77,4 +77,6 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
 
     implementation("io.coil-kt:coil-compose:2.6.0") // coil for loading web images
+    implementation("androidx.compose.material:material-icons-extended:1.3.1") // icons extended
+
 }
