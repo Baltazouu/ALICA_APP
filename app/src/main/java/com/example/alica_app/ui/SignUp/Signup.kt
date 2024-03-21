@@ -42,7 +42,7 @@ fun SignUpScreen() {
      var firstName by remember { mutableStateOf("") }
      var lastName by remember { mutableStateOf("") }
      var emailAddress by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
+     var password by remember { mutableStateOf("") }
 
 
 
@@ -56,7 +56,7 @@ fun SignUpScreen() {
             InputComponent(label = "FirstName", text = firstName, updateText = {firstName = it})
         }
         item{
-            InputComponent(label = "LastName", text = lastName, updateText = {emailAddress = it})
+            InputComponent(label = "LastName", text = lastName, updateText = {lastName = it})
         }
         item{
             InputComponent(label = "Email", text = emailAddress, updateText = {emailAddress = it})
@@ -65,7 +65,7 @@ fun SignUpScreen() {
             ShowHidePasswordTextField(label = "Password",text = password, updateText = { password = it});
         }
         item {
-            SignupButtonComponent();
+            SignupButtonComponent(signup = { /* TO DO */ });
         }
     }
 }
@@ -129,9 +129,9 @@ fun ShowHidePasswordTextField(label: String,text: String,updateText: (String) ->
 }
 
 @Composable
-fun SignupButtonComponent(){
+fun SignupButtonComponent(signup:() -> Unit){
 
-    OutlinedButton(onClick = { /*TODO*/ }, colors = ButtonDefaults.buttonColors(Color.Cyan)) {
+    OutlinedButton(onClick = signup, colors = ButtonDefaults.buttonColors(Color.Cyan)) {
         Text(text = "Signup", color = Color.Black)
     }
 
