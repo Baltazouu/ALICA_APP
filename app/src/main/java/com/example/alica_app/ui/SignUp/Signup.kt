@@ -1,5 +1,6 @@
 package com.example.alica_app.ui.SignUp
 
+import ViewModelSignUp
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.width

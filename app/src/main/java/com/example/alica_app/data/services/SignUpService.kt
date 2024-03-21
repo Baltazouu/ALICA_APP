@@ -10,10 +10,14 @@ import retrofit2.http.Body
 import retrofit2.http.POST
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
+import retrofit2.http.Headers
 
 val httpClient = OkHttpClient()
 
 interface SignUpService {
+
+    @Headers("Content-Type: application/json")
+
     @POST("auth/signUp")
     fun signUp(@Body signUpBody: SignUpBody): Call<Unit>
 }
