@@ -11,6 +11,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.example.alica_app.ui.evenements.Evenements
+import com.example.alica_app.ui.event.EventDetail
 import com.example.alica_app.ui.home.NavBar
 import com.example.alica_app.ui.offerCreation.OfferCreation
 import com.example.alica_app.ui.theme.ALICA_APPTheme
@@ -22,7 +24,9 @@ class MainActivity : ComponentActivity() {
             ALICA_APPTheme {
                 Column{
                     NavBar()
-                    OfferCreation()
+                    //EventDetail()
+                    //OfferCreation()
+                    Evenements()
                 }
             }
         }

@@ -11,6 +11,17 @@
     <string name="job_description_offer">Descriptif du poste</string>
     <string name="seek_job_offer">Poste recherché</string>
     <string name="experience_offer">Experience</string>
-    <string name="studies_level_offer">Niceau d étude</string>
+    <string name="studies_level_offer">Niveau d étude</string>
+
+    <string name="event">Evenements</string>
+    <string name="details">Voir les détails</string>
+    <string name="inscription">S inscrire</string>
+
+
+    <string name="test_name">Laser Game</string>
+    <string name="test_city">Clermont-Ferrand</string>
+    <string name="test_date">21/21/21221</string>
+    <string name="test_limite">30</string>
+    <string name="test_inscrit">8</string>
 
 </resources>
