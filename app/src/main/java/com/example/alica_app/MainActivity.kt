@@ -4,7 +4,6 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import com.example.alica_app.ui.SignUp.SignUpScreen
-import com.example.alica_app.ui.signIn.ConnectionScreen
 import com.example.alica_app.ui.theme.ALICA_APPTheme
 
 class MainActivity : ComponentActivity() {
@@ -12,7 +11,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             ALICA_APPTheme {
-                ConnectionScreen()
+                SignUpScreen()
             }
         }
     }
