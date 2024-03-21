@@ -52,7 +52,7 @@ fun SignUpScreen(
             InputComponent(label = "FirstName", text = firstName, updateText = {firstName = it})
         }
         item{
-            InputComponent(label = "LastName", text = lastName, updateText = {emailAddress = it})
+            InputComponent(label = "LastName", text = lastName, updateText = {lastName = it})
         }
         item{
             InputComponent(label = "Email", text = emailAddress, updateText = {emailAddress = it})
@@ -63,6 +63,10 @@ fun SignUpScreen(
         item {
             SignupButtonComponent();
         }
+        item {
+            Text(text = "Already have an account ? :" )
+            SignInButtonComponent();
+        }
     }
 
     ViewModelSignUp().signUp(firstName, lastName, emailAddress, password)
@@ -72,11 +76,13 @@ fun SignUpScreen(
 @Composable
 fun InputComponent(label:String, text:String,updateText:(String) -> Unit) {
 
-        OutlinedTextField(modifier = Modifier.width(280.dp),
+        OutlinedTextField(modifier = Modifier
+            .width(280.dp),
             shape = RoundedCornerShape(percent = 20),
             value = text,
             onValueChange = updateText,
-            label = { Text(text = label) })
+            label = { Text(text = label) }
+        )
 
 }
 
@@ -133,4 +139,10 @@ fun SignupButtonComponent(){
         Text(text = "Signup", color = Color.Black)
     }
 
+}
+@Composable
+fun SignInButtonComponent(){
+    OutlinedButton(onClick = { /*TODO*/ }, colors = ButtonDefaults.buttonColors(Color.Gray)) {
+        Text(text = "SignIn here !",color = Color.Cyan)
+    }
 }
