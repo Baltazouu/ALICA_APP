@@ -1,6 +1,7 @@
 package com.example.alica_app.ui.SignUp
 
 import ViewModelSignUp
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.width
@@ -23,12 +24,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import coil.request.SuccessResult
 import com.example.alica_app.ui.signIn.BackgroundImageWithTitle
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -40,64 +43,165 @@ import kotlinx.coroutines.launch
 fun SignUpScreen(
     viewModel: ViewModelSignUp = ViewModelSignUp()
 ) {
+    var firstName by remember { mutableStateOf("") }
+    var lastName by remember { mutableStateOf("") }
+    var emailAddress by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
 
-     var firstName by remember { mutableStateOf("") }
-     var lastName by remember { mutableStateOf("") }
-     var emailAddress by remember { mutableStateOf("") }
-     var password by remember { mutableStateOf("") }
-
-    LazyColumn(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(15.dp)) {
+    var firstNameTouched by remember { mutableStateOf(false) }
+    var lastNameTouched by remember { mutableStateOf(false) }
+    var emailAddressTouched by remember { mutableStateOf(false) }
+    var passwordTouched by remember { mutableStateOf(false) }
 
 
+    val namesRegex = ".{3,}".toRegex()
+    val emailRegex = android.util.Patterns.EMAIL_ADDRESS.toRegex()
+    val passwordRegex = ".{6,}".toRegex()
+
+    LazyColumn(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(15.dp)
+    ) {
         item {
-            BackgroundImageWithTitle("test","SignUp")
+            BackgroundImageWithTitle("test", "SignUp")
         }
-        item{
-            InputComponent(label = "FirstName", text = firstName, updateText = {firstName = it})
+        item {
+            InputComponent(
+                label = "FirstName",
+                text = firstName,
+                updateText = { firstName = it },
+                onFieldTouched = { firstNameTouched = true }
+            )
+            if (firstNameTouched) {
+                ErrorMessageComponent(
+                    label = firstName,
+                    errorMessage = "Firstname should contain at least 3 characters",
+                    regex = namesRegex
+                )
+            }
         }
-        item{
-            InputComponent(label = "LastName", text = lastName, updateText = {lastName = it})
+        item {
+            InputComponent(
+                label = "LastName",
+                text = lastName,
+                updateText = { lastName = it },
+                onFieldTouched = { lastNameTouched = true }
+            )
+            if (lastNameTouched) {
+                ErrorMessageComponent(
+                    label = lastName,
+                    errorMessage = "Lastname should contain at least 3 characters",
+                    regex = namesRegex
+                )
+            }
         }
-        item{
-            InputComponent(label = "Email", text = emailAddress, updateText = {emailAddress = it})
+        item {
+            InputComponent(
+                label = "Email",
+                text = emailAddress,
+                updateText = { emailAddress = it },
+                onFieldTouched = { emailAddressTouched = true }
+            )
+            if (emailAddressTouched) {
+                ErrorMessageComponent(
+                    label = emailAddress,
+                    errorMessage = "Invalid email address",
+                    regex = emailRegex
+                )
+            }
         }
-        item{
-            ShowHidePasswordTextField(label = "Password",text = password, updateText = { password = it});
+        item {
+            ShowHidePasswordTextField(
+                label = "Password",
+                text = password,
+                updateText = { password = it },
+                onFieldTouched = { passwordTouched = true }
+            )
+            if (passwordTouched) {
+                ErrorMessageComponent(
+                    label = password,
+                    errorMessage = "Password should contain at least 6 characters",
+                    regex = passwordRegex
+                )
+            }
         }
         item {
             SignupButtonComponent(signup = {
 
 
-                CoroutineScope(Dispatchers.IO).launch {
-                    viewModel.signUp(firstName, lastName, emailAddress, password)
+                firstNameTouched = true
+                lastNameTouched = true
+                emailAddressTouched = true
+                passwordTouched = true
+
+                if (emailRegex.matches(emailAddress) && namesRegex.matches(firstName) && namesRegex.matches(lastName) && passwordRegex.matches(password)) {
+
+                    Log.i("MESSAGE","All fields are valid")
+
+                    CoroutineScope(Dispatchers.IO).launch {
+                        viewModel.signUp(firstName, lastName, emailAddress, password)
+
+
+                    }
+                    if(viewModel.signUpResult.value == true){
+                        Log.i("MESSAGE","Sign up successful")
+                    }
+                    else{
+                        Log.e("MESSAGE","Sign up failed")
+                    }
                 }
-            });
+            })
         }
     }
-
-
 }
 
 
 @Composable
-fun InputComponent(label:String, text:String,updateText:(String) -> Unit) {
+fun ErrorMessageComponent(label: String, errorMessage: String, regex: Regex){
 
-        OutlinedTextField(modifier = Modifier.width(280.dp),
+    if(!regex.matches(label)){
+            Text(text = errorMessage, color = Color.Red)
+        }
+}
+
+
+@Composable
+fun InputComponent(label:String,
+                   text:String,
+                   updateText:(String) -> Unit,
+                   onFieldTouched: () -> Unit)
+{
+
+        OutlinedTextField(modifier = Modifier.width(280.dp)
+            .onFocusChanged {
+                if (it.isFocused) {
+                    onFieldTouched()
+                }
+            },
             shape = RoundedCornerShape(percent = 20),
             value = text,
             onValueChange = updateText,
-            label = { Text(text = label) })
+            label = { Text(text = label) },
+            )
 
 }
 
 
+
+
+
 @Composable
-fun ShowHidePasswordTextField(label: String,text: String,updateText: (String) -> Unit) {
+fun ShowHidePasswordTextField(label: String,
+                              text: String,
+                              updateText: (String) -> Unit,
+                              onFieldTouched: () -> Unit) {
 
     var showPassword by remember { mutableStateOf(value = false) }
 
     OutlinedTextField(
-        modifier = Modifier.width(280.dp),
+        modifier = Modifier.width(280.dp)
+            .onFocusChanged { if (it.isFocused) onFieldTouched() },
         value = text,
         onValueChange =  updateText ,
         label = {

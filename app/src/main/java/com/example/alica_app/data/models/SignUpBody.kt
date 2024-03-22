@@ -13,7 +13,7 @@ data class SignUpBody(
     @SerialName("lastName")
     val lastName: String,
 
-    @SerialName("emailAddress")
+    @SerialName("email")
     val emailAddress: String,
 
     @SerialName("password")

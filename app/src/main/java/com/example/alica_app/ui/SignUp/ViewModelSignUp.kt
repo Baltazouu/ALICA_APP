@@ -12,30 +12,54 @@ class ViewModelSignUp : ViewModel() {
 
     private val service = createSignUpRetrofit().create(SignUpService::class.java)
     val signUpResult = MutableLiveData<Boolean>()
+    val errorMessage = MutableLiveData<String>()
 
     fun signUp(firstName: String, lastName: String, emailAddress: String, password: String) {
-        val signUpBody = SignUpBody(firstName, lastName, emailAddress, password)
+        if (validateFields(firstName, lastName, emailAddress, password)) {
+            val signUpBody = SignUpBody(firstName, lastName, emailAddress, password)
 
-        service.signUp(signUpBody).enqueue(object : Callback<Unit> {
-            override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
-                if (response.isSuccessful) {
-                    // La demande a réussi
-                    Log.i("SUCCESS","SUCCESS")
-                    signUpResult.value = true
-                } else {
-                    // La demande a échoué
-                    Log.i("FAILED","FAILED")
+            service.signUp(signUpBody).enqueue(object : Callback<Unit> {
+                override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
+                    if (response.isSuccessful) {
+                        // La demande a réussi
+                        Log.i("SignUp", "Sign up successful")
+                        signUpResult.value = true
+                    } else {
+                        // La demande a échoué
+                        Log.e("SignUp", "Sign up failed")
+                        signUpResult.value = false
+                    }
+                }
+
+                override fun onFailure(call: Call<Unit>, t: Throwable) {
+                    // La demande a échoué à cause d'une erreur réseau ou autre
+                    Log.e("SignUp", "Sign up failure", t)
                     signUpResult.value = false
                 }
-            }
+            })
+        }
+    }
 
-            override fun onFailure(call: Call<Unit>, t: Throwable) {
-                // La demande a échoué à cause d'une erreur réseau ou autre
+    private fun validateFields(firstName: String, lastName: String, emailAddress: String, password: String): Boolean {
+        if (firstName.isEmpty() || lastName.isEmpty() || emailAddress.isEmpty() || password.isEmpty()) {
+            errorMessage.value = "All fields are required."
+            return false
+        }
 
-                Log.i("FAILURE",t.message.toString())
-                Log.i("FAILURE","FAILURE")
-                signUpResult.value = false
-            }
-        })
+        if (!android.util.Patterns.EMAIL_ADDRESS.matcher(emailAddress).matches()) {
+            errorMessage.value = "Invalid email address."
+            return false
+        }
+
+        if (password.length < 6) {
+            errorMessage.value = "Password must be at least 6 characters long."
+            return false
+        }
+
+        return true
+    }
+
+    public fun getSignUpResult(): MutableLiveData<Boolean> {
+        return signUpResult
     }
 }
