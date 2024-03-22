@@ -149,10 +149,9 @@ fun SignUpScreen(
                     Log.i("MESSAGE", "All fields are valid")
 
                     coroutineScope.launch {
-                        // Créer un canal pour la communication entre les coroutines
+
                         val channel = Channel<Boolean>()
 
-                        // Lancer la coroutine enfant pour exécuter signUp() et envoyer le résultat à travers le canal
                         launch {
                             val signUpResult = viewModel.signUp(
                                 firstName,
@@ -160,14 +159,11 @@ fun SignUpScreen(
                                 emailAddress,
                                 password
                             )
-                            // Envoyer le résultat à travers le canal
                             channel.send(signUpResult)
                         }
 
-                        // Attendre que la coroutine enfant signale la fin de son exécution
                         val childResult = channel.receive()
 
-                        // Exécuter les conditions if et else après la réception du résultat de la coroutine enfant
                         if (childResult == true) {
                             Log.i("PARENT", "success")
                             showSuccessMessage = true
