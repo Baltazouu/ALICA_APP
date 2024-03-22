@@ -18,9 +18,11 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -35,7 +37,10 @@ import coil.request.SuccessResult
 import com.example.alica_app.ui.signIn.BackgroundImageWithTitle
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
+import kotlin.math.log
 
 
 @Composable
@@ -53,6 +58,10 @@ fun SignUpScreen(
     var emailAddressTouched by remember { mutableStateOf(false) }
     var passwordTouched by remember { mutableStateOf(false) }
 
+    var showSuccessMessage by remember { mutableStateOf(false) }
+    var showErrorMessage by remember { mutableStateOf(false) }
+
+    val coroutineScope = rememberCoroutineScope()
 
     val namesRegex = ".{3,}".toRegex()
     val emailRegex = android.util.Patterns.EMAIL_ADDRESS.toRegex()
@@ -64,11 +73,11 @@ fun SignUpScreen(
         verticalArrangement = Arrangement.spacedBy(15.dp)
     ) {
         item {
-            BackgroundImageWithTitle("test", "SignUp")
+            BackgroundImageWithTitle("test", "S'inscrire")
         }
         item {
             InputComponent(
-                label = "FirstName",
+                label = "Prénom",
                 text = firstName,
                 updateText = { firstName = it },
                 onFieldTouched = { firstNameTouched = true }
@@ -83,7 +92,7 @@ fun SignUpScreen(
         }
         item {
             InputComponent(
-                label = "LastName",
+                label = "Nom",
                 text = lastName,
                 updateText = { lastName = it },
                 onFieldTouched = { lastNameTouched = true }
@@ -113,7 +122,7 @@ fun SignUpScreen(
         }
         item {
             ShowHidePasswordTextField(
-                label = "Password",
+                label = "Mot de passe",
                 text = password,
                 updateText = { password = it },
                 onFieldTouched = { passwordTouched = true }
@@ -128,32 +137,73 @@ fun SignUpScreen(
         }
         item {
             SignupButtonComponent(signup = {
-
-
                 firstNameTouched = true
                 lastNameTouched = true
                 emailAddressTouched = true
                 passwordTouched = true
 
-                if (emailRegex.matches(emailAddress) && namesRegex.matches(firstName) && namesRegex.matches(lastName) && passwordRegex.matches(password)) {
+                if (emailRegex.matches(emailAddress) &&
+                    namesRegex.matches(firstName) &&
+                    namesRegex.matches(lastName) &&
+                    passwordRegex.matches(password)) {
+                    Log.i("MESSAGE", "All fields are valid")
 
-                    Log.i("MESSAGE","All fields are valid")
+                    coroutineScope.launch {
+                        // Créer un canal pour la communication entre les coroutines
+                        val channel = Channel<Boolean>()
 
-                    CoroutineScope(Dispatchers.IO).launch {
-                        viewModel.signUp(firstName, lastName, emailAddress, password)
+                        // Lancer la coroutine enfant pour exécuter signUp() et envoyer le résultat à travers le canal
+                        launch {
+                            val signUpResult = viewModel.signUp(
+                                firstName,
+                                lastName,
+                                emailAddress,
+                                password
+                            )
+                            // Envoyer le résultat à travers le canal
+                            channel.send(signUpResult)
+                        }
 
+                        // Attendre que la coroutine enfant signale la fin de son exécution
+                        val childResult = channel.receive()
 
-                    }
-                    if(viewModel.signUpResult.value == true){
-                        Log.i("MESSAGE","Sign up successful")
-                    }
-                    else{
-                        Log.e("MESSAGE","Sign up failed")
+                        // Exécuter les conditions if et else après la réception du résultat de la coroutine enfant
+                        if (childResult == true) {
+                            Log.i("PARENT", "success")
+                            showSuccessMessage = true
+                            showErrorMessage = false
+                        } else {
+                            Log.i("PARENT", "failure")
+                            showErrorMessage = true
+                            showSuccessMessage = false
+                        }
                     }
                 }
             })
         }
+        item {
+            if(showSuccessMessage) {
+                SignUpSuccessResult()
+            }
+            else if(showErrorMessage){
+                SignUpFailureResult()
+            }
+        }
+
+
+
     }
+}
+
+@Preview
+@Composable
+fun SignUpSuccessResult(){
+        Text(text = "Sign up successful", color = Color.Green)
+}
+
+@Composable
+fun SignUpFailureResult(){
+    Text(text = "Sign up failed", color = Color.Red)
 }
 
 
@@ -173,7 +223,8 @@ fun InputComponent(label:String,
                    onFieldTouched: () -> Unit)
 {
 
-        OutlinedTextField(modifier = Modifier.width(280.dp)
+        OutlinedTextField(modifier = Modifier
+            .width(280.dp)
             .onFocusChanged {
                 if (it.isFocused) {
                     onFieldTouched()
@@ -200,7 +251,8 @@ fun ShowHidePasswordTextField(label: String,
     var showPassword by remember { mutableStateOf(value = false) }
 
     OutlinedTextField(
-        modifier = Modifier.width(280.dp)
+        modifier = Modifier
+            .width(280.dp)
             .onFocusChanged { if (it.isFocused) onFieldTouched() },
         value = text,
         onValueChange =  updateText ,

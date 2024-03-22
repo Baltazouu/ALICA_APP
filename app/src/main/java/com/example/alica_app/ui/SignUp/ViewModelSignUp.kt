@@ -4,62 +4,64 @@ import androidx.lifecycle.ViewModel
 import com.example.alica_app.data.models.SignUpBody
 import com.example.alica_app.data.services.SignUpService
 import com.example.alica_app.data.services.createSignUpRetrofit
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
+import kotlin.coroutines.suspendCoroutine
 
 class ViewModelSignUp : ViewModel() {
 
+
     private val service = createSignUpRetrofit().create(SignUpService::class.java)
     val signUpResult = MutableLiveData<Boolean>()
-    val errorMessage = MutableLiveData<String>()
 
-    fun signUp(firstName: String, lastName: String, emailAddress: String, password: String) {
-        if (validateFields(firstName, lastName, emailAddress, password)) {
-            val signUpBody = SignUpBody(firstName, lastName, emailAddress, password)
+    // Modifiez la méthode signUp() pour qu'elle utilise un canal pour signaler la fin de son exécution
+    suspend fun signUp(firstName: String, lastName: String, emailAddress: String, password: String): Boolean {
+        val signUpBody = SignUpBody(firstName, lastName, emailAddress, password)
+        val channel = Channel<Boolean>()
 
-            service.signUp(signUpBody).enqueue(object : Callback<Unit> {
-                override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
-                    if (response.isSuccessful) {
-                        // La demande a réussi
-                        Log.i("SignUp", "Sign up successful")
-                        signUpResult.value = true
-                    } else {
-                        // La demande a échoué
-                        Log.e("SignUp", "Sign up failed")
-                        signUpResult.value = false
+        service.signUp(signUpBody).enqueue(object : Callback<Unit> {
+            override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
+                if (response.isSuccessful) {
+                    // La demande a réussi
+                    Log.i("CHILD", "Sign up successful")
+                    CoroutineScope(Dispatchers.Default).launch {
+                        channel.send(true) // Envoyer le résultat à travers le canal
+                    }
+                } else {
+                    // La demande a échoué
+                    Log.e("CHILD", "Sign up failed")
+                    CoroutineScope(Dispatchers.Default).launch {
+                        channel.send(false) // Envoyer le résultat à travers le canal
                     }
                 }
+            }
 
-                override fun onFailure(call: Call<Unit>, t: Throwable) {
-                    // La demande a échoué à cause d'une erreur réseau ou autre
-                    Log.e("SignUp", "Sign up failure", t)
-                    signUpResult.value = false
+            override fun onFailure(call: Call<Unit>, t: Throwable) {
+                // La demande a échoué à cause d'une erreur réseau ou autre
+                Log.e("CHILD", "Sign up failure", t)
+                CoroutineScope(Dispatchers.Default).launch {
+                    channel.send(false) // Envoyer le résultat à travers le canal
                 }
-            })
-        }
+            }
+        })
+
+        // Attendre que la méthode signUp mette à jour signUpResult et retourner le résultat
+        return channel.receive()
     }
 
-    private fun validateFields(firstName: String, lastName: String, emailAddress: String, password: String): Boolean {
-        if (firstName.isEmpty() || lastName.isEmpty() || emailAddress.isEmpty() || password.isEmpty()) {
-            errorMessage.value = "All fields are required."
-            return false
-        }
 
-        if (!android.util.Patterns.EMAIL_ADDRESS.matcher(emailAddress).matches()) {
-            errorMessage.value = "Invalid email address."
-            return false
-        }
 
-        if (password.length < 6) {
-            errorMessage.value = "Password must be at least 6 characters long."
-            return false
-        }
-
-        return true
-    }
-
-    public fun getSignUpResult(): MutableLiveData<Boolean> {
+    public fun signUpResult(): MutableLiveData<Boolean> {
         return signUpResult
     }
+
+
 }
