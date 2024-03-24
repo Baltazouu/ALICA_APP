@@ -13,7 +13,8 @@ import com.example.alica_app.ui.core.NavBar
 import com.example.alica_app.ui.signUp.SignUpScreen
 import com.example.alica_app.ui.event.events.Events
 import com.example.alica_app.ui.home.Home
-import com.example.alica_app.ui.offer.offer.offers.Offers
+import com.example.alica_app.ui.offer.offer.Offers
+import com.example.alica_app.ui.offer.offer.Offers
 import com.example.alica_app.ui.signIn.SignIn
 import com.example.alica_app.ui.theme.ALICA_APPTheme
 
