@@ -30,6 +30,7 @@ import coil.compose.AsyncImage
 import com.example.alica_app.R
 import com.example.alica_app.ui.signUp.InputComponent
 import com.example.alica_app.ui.signUp.PasswordTextField
+import com.example.alica_app.ui.utils.BackgroundImageWithTitle
 
 @Composable
 @Preview
@@ -81,36 +82,5 @@ fun offerSpec(text:String = "TEXT"){
 
 }
 
-@Composable
-fun BackgroundImageWithTitle(
-    contentDescription: String,
-    text: String
 
-){
-
-    Box(modifier = Modifier
-        .fillMaxWidth()
-        .background(Color.White),
-        contentAlignment = Alignment.Center
-    ){
-        Image(
-            painter = painterResource(id = R.drawable.bandeau),
-            contentDescription = contentDescription,
-            modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxHeight()
-                .blur(
-                    radiusX = 4.dp,
-                    radiusY = 4.dp,
-                    edgeTreatment = BlurredEdgeTreatment(RoundedCornerShape(5.dp))
-                )
-        )
-        Text(text = text,
-            color = Color.White,
-            fontWeight = FontWeight.Bold,
-            fontSize = 30.sp
-
-        )
-    }
-}
 

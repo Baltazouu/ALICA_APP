@@ -38,7 +38,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.alica_app.NavigationItem
 import com.example.alica_app.ui.core.NavBar
-import com.example.alica_app.ui.signIn.BackgroundImageWithTitle
+import com.example.alica_app.ui.utils.BackgroundImageWithTitle
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
 
