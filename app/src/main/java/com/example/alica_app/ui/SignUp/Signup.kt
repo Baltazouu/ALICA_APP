@@ -18,7 +18,6 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -33,20 +32,21 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import coil.request.SuccessResult
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
+import com.example.alica_app.NavigationItem
 import com.example.alica_app.ui.signIn.BackgroundImageWithTitle
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
-import kotlin.math.log
 
 
 @Composable
 @Preview
 fun SignUpScreen(
-    viewModel: ViewModelSignUp = ViewModelSignUp()
+    viewModel: ViewModelSignUp = ViewModelSignUp(),
+    navHostController: NavHostController = rememberNavController(),
+    navController: NavController = rememberNavController()
 ) {
     var firstName by remember { mutableStateOf("") }
     var lastName by remember { mutableStateOf("") }
@@ -121,7 +121,7 @@ fun SignUpScreen(
             }
         }
         item {
-            ShowHidePasswordTextField(
+            PasswordTextField(
                 label = "Mot de passe",
                 text = password,
                 updateText = { password = it },
@@ -165,6 +165,7 @@ fun SignUpScreen(
                         val childResult = channel.receive()
 
                         if (childResult == true) {
+                            navController.navigate(NavigationItem.Login.route)
                             Log.i("PARENT", "success")
                             showSuccessMessage = true
                             showErrorMessage = false
@@ -185,9 +186,6 @@ fun SignUpScreen(
                 SignUpFailureResult()
             }
         }
-
-
-
     }
 }
 
@@ -239,10 +237,10 @@ fun InputComponent(label:String,
 
 
 @Composable
-fun ShowHidePasswordTextField(label: String,
-                              text: String,
-                              updateText: (String) -> Unit,
-                              onFieldTouched: () -> Unit) {
+fun PasswordTextField(label: String,
+                      text: String,
+                      updateText: (String) -> Unit,
+                      onFieldTouched: () -> Unit) {
 
     var showPassword by remember { mutableStateOf(value = false) }
 

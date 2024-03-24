@@ -3,6 +3,9 @@ plugins {
     alias(libs.plugins.jetbrainsKotlinAndroid)
 
     kotlin("plugin.serialization") version "1.9.22"
+
+    id("androidx.navigation.safeargs.kotlin")
+
 }
 
 
@@ -104,6 +107,24 @@ dependencies {
 
     // Navigation
     val nav_version = "2.7.7"
+
+    // Kotlin
+    implementation("androidx.navigation:navigation-fragment-ktx:$nav_version")
+    implementation("androidx.navigation:navigation-ui-ktx:$nav_version")
+
+    // Feature module Support
+    implementation("androidx.navigation:navigation-dynamic-features-fragment:$nav_version")
+
+    // Testing Navigation
+    androidTestImplementation("androidx.navigation:navigation-testing:$nav_version")
+
+    // Jetpack Compose Integration
     implementation("androidx.navigation:navigation-compose:$nav_version")
+
+    // splash screen
+    implementation("androidx.window:window:1.0.0-alpha05")
+
+    implementation("androidx.compose.ui:ui:1.0.0")
+
 
 }

@@ -7,8 +7,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.BlurredEdgeTreatment
@@ -21,10 +26,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.example.alica_app.R
+import com.example.alica_app.ui.SignUp.InputComponent
+import com.example.alica_app.ui.SignUp.PasswordTextField
 
 @Composable
 @Preview
-fun ConnectionScreen() {
+fun SignIn() {
+
+    var email by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+
     LazyColumn(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
 
         item {
@@ -42,8 +53,22 @@ fun ConnectionScreen() {
             Text(text = "Connecetez-vous", fontSize = 20.sp)
 
         }
+        item{
+            InputComponent("Email",email, { email= it },{})
+        }
+        item{
+            PasswordTextField(label = "Password", text = password, updateText = { password = it }) {
+            }
+        }
+        item{
+            Button(onClick = { /*TODO*/ }) {
+                Text(text = "Connexion")
+            }
+        }
     }
 }
+
+
 
 @Preview
 @Composable
