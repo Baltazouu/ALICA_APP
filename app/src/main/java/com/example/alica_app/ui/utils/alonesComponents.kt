@@ -40,6 +40,7 @@ fun BackgroundImageWithTitle(
 
     Box(modifier = Modifier
         .fillMaxWidth()
+        .height(200.dp)
         .background(Color.White),
         contentAlignment = Alignment.Center
     ){
