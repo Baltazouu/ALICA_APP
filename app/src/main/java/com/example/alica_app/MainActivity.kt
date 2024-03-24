@@ -10,6 +10,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.alica_app.ui.core.NavBar
+import com.example.alica_app.ui.core.TopBar
 import com.example.alica_app.ui.signUp.SignUpScreen
 import com.example.alica_app.ui.event.events.Events
 import com.example.alica_app.ui.home.Home
@@ -30,6 +31,7 @@ class MainActivity : ComponentActivity() {
                 val navController = rememberNavController()
 
                 Scaffold(
+                    topBar = { TopBar()},
                     bottomBar = {NavBar(navController = navController)}
                 ) {padding ->
                     NavHost(modifier = Modifier.padding(padding),
