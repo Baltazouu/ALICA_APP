@@ -1,4 +1,5 @@
 package com.example.alica_app.ui.signIn
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -18,6 +19,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -39,13 +41,22 @@ import com.example.alica_app.ui.signUp.InputComponent
 import com.example.alica_app.ui.signUp.PasswordTextField
 import com.example.alica_app.ui.utils.BackgroundImageWithTitle
 import com.google.android.gms.wallet.button.ButtonConstants
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 
 @Composable
-@Preview
-fun SignIn(navController: NavController = rememberNavController()) {
+fun SignIn(navController: NavController,
+           viewModelSignIn: ViewModelSignIn = ViewModelSignIn()) {
 
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+
+    var isSignIn by remember { mutableStateOf(false) }
+    var failSignIn by remember { mutableStateOf(false) }
+
+    val coroutineScope = rememberCoroutineScope()
+
 
     Column(modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -57,15 +68,47 @@ fun SignIn(navController: NavController = rememberNavController()) {
         InputComponent("Email",email, { email= it },{})
         PasswordTextField(label = "Password", text = password, updateText = { password = it }) {
         }
-
-        Button(onClick = { navController.navigate(NavigationItem.SignUp.route) },colors = ButtonDefaults.buttonColors(containerColor = colorResource(id = R.color.alica_blue))){
-            Text(text = "Connexion")
+        if(failSignIn){
+            Text(text = "Email ou mot de passe incorrect", color = Color.Red)
         }
 
-        Text(text = "Pas encore Inscrit ?", fontSize = 18.sp)
-        TextButton(onClick = { navController.navigate(NavigationItem.SignUp.route) }) {
-            Text(text = "S'inscrire", color = colorResource(id = R.color.alica_blue))
+        if(!isSignIn) {
+            Button(
+                colors = ButtonDefaults.buttonColors(containerColor = colorResource(id = R.color.alica_blue)),
+                onClick = {
 
+                    coroutineScope.launch {
+
+                        val channel = Channel<Boolean>()
+
+                        launch {
+                            val signInResult = viewModelSignIn.signIn(email, password)
+                            channel.send(signInResult)
+                        }
+
+                        val result = channel.receive();
+
+                        if (result) {
+                            isSignIn = true
+                            failSignIn = false
+                        } else {
+                            isSignIn = false
+                            failSignIn = true
+                        }
+                    }
+
+                }) {
+                Text(text = "Connexion")
+            }
+
+            Text(text = "Pas encore Inscrit ?", fontSize = 18.sp)
+            TextButton(onClick = { navController.navigate(NavigationItem.SignUp.route) }) {
+                Text(text = "S'inscrire", color = colorResource(id = R.color.alica_blue))
+
+            }
+        }
+        else{
+            Text(text = "Connexion réussie", fontSize = 20.sp)
         }
     }
 }

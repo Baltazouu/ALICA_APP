@@ -1,4 +1,4 @@
-package com.example.alica_app.ui.offer.offerDetails
+package com.example.alica_app.ui.offers.offerDetail
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement

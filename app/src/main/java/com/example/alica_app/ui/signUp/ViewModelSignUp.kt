@@ -2,22 +2,19 @@ import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.alica_app.data.models.SignUpBody
-import com.example.alica_app.data.services.SignUpService
-import com.example.alica_app.data.services.createSignUpRetrofit
+import com.example.alica_app.data.services.AuthenticationService
+import com.example.alica_app.data.services.createAuthenticationRetrofit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.withContext
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import kotlin.coroutines.resume
-import kotlin.coroutines.resumeWithException
-import kotlin.coroutines.suspendCoroutine
 
 class ViewModelSignUp : ViewModel() {
 
 
-    private val service = createSignUpRetrofit().create(SignUpService::class.java)
+    private val service = createAuthenticationRetrofit().create(AuthenticationService::class.java)
     val signUpResult = MutableLiveData<Boolean>()
 
     suspend fun signUp(firstName: String, lastName: String, emailAddress: String, password: String): Boolean {
@@ -45,9 +42,6 @@ class ViewModelSignUp : ViewModel() {
             resultChannel.receive()
         }
     }
-
-
-
 
     public fun signUpResult(): MutableLiveData<Boolean> {
         return signUpResult

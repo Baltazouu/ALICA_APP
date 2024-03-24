@@ -19,7 +19,7 @@ fun NavBar(navController: NavController, ) {
     val items = arrayOf(NavigationItem.Offers,
                         NavigationItem.Home,
                         NavigationItem.Events)
-    var selectedItem by remember { mutableIntStateOf(2) }
+    var selectedItem by remember { mutableIntStateOf(1) }
     NavigationBar {
         items.forEachIndexed { index, item ->
             NavigationBarItem(
