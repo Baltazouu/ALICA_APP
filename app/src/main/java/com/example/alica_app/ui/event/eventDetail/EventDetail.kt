@@ -1,4 +1,4 @@
-package com.example.alica_app.ui.event
+package com.example.alica_app.ui.event.eventDetail
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement

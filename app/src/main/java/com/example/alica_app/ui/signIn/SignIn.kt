@@ -24,14 +24,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import com.example.alica_app.R
-import com.example.alica_app.ui.SignUp.InputComponent
-import com.example.alica_app.ui.SignUp.PasswordTextField
+import com.example.alica_app.ui.signUp.InputComponent
+import com.example.alica_app.ui.signUp.PasswordTextField
 
 @Composable
 @Preview
-fun SignIn() {
+fun SignIn(navController: NavController = rememberNavController()) {
 
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }

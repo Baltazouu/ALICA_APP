@@ -14,25 +14,30 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.example.alica_app.NavigationItem
 
 
-@Preview
+//@Preview
 @Composable
-fun NavBar() {
+fun NavBar(navController: NavController, ) {
     val items = arrayOf(NavigationItem.Login,
                         NavigationItem.SignUp,
                         NavigationItem.Home,
                         NavigationItem.Offers,
                         NavigationItem.Events)
-    var selectedItem by remember { mutableIntStateOf(0) }
+    var selectedItem by remember { mutableIntStateOf(2) }
     NavigationBar {
         items.forEachIndexed { index, item ->
             NavigationBarItem(
                 icon = { Icon(item.icon, contentDescription = null) },
                 label = { Text(item.route) },
                 selected = selectedItem == index,
-                onClick = { selectedItem = index }
+                onClick = {
+                    selectedItem = index
+                    navController.navigate(item.route)
+                    }
             )
         }
     }

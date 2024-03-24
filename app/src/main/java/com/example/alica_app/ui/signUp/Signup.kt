@@ -1,4 +1,4 @@
-package com.example.alica_app.ui.SignUp
+package com.example.alica_app.ui.signUp
 
 import ViewModelSignUp
 import android.util.Log
@@ -35,7 +35,6 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.alica_app.NavigationItem
 import com.example.alica_app.ui.core.NavBar
@@ -45,11 +44,9 @@ import kotlinx.coroutines.launch
 
 
 @Composable
-@Preview
 fun SignUpScreen(
     viewModel: ViewModelSignUp = ViewModelSignUp(),
-    navHostController: NavHostController = rememberNavController(),
-    navController: NavController = rememberNavController()
+    navController: NavController
 ) {
     var firstName by remember { mutableStateOf("") }
     var lastName by remember { mutableStateOf("") }
@@ -70,10 +67,9 @@ fun SignUpScreen(
     val emailRegex = android.util.Patterns.EMAIL_ADDRESS.toRegex()
     val passwordRegex = ".{6,}".toRegex()
 
-    Scaffold(
-        bottomBar = { NavBar() }){ padding->
-        LazyColumn(
-            modifier = Modifier.fillMaxWidth().padding(padding),
+   LazyColumn(
+            modifier = Modifier
+                .fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(15.dp)
         ) {
@@ -191,7 +187,7 @@ fun SignUpScreen(
                     SignUpFailureResult()
                 }
             }
-        }
+
     }
 }
 
