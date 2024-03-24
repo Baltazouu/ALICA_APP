@@ -1,4 +1,5 @@
-package com.example.alica_app.model
+package com.example.alica_app.data.models
+
 
 data class ResponseAuthentication(
     val token:String,
@@ -6,4 +7,4 @@ data class ResponseAuthentication(
     val email:String,
     val id: String,
     val refreshToken:String,
-    ) {}
+) {}

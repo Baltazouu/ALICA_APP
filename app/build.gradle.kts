@@ -125,6 +125,7 @@ dependencies {
     implementation("androidx.window:window:1.0.0-alpha05")
 
     implementation("androidx.compose.ui:ui:1.0.0")
+    implementation(kotlin("reflect"))
 
 
 }

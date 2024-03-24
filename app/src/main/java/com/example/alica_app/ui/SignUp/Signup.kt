@@ -4,6 +4,7 @@ import ViewModelSignUp
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -16,6 +17,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -36,6 +38,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.alica_app.NavigationItem
+import com.example.alica_app.ui.core.NavBar
 import com.example.alica_app.ui.signIn.BackgroundImageWithTitle
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
@@ -67,123 +70,126 @@ fun SignUpScreen(
     val emailRegex = android.util.Patterns.EMAIL_ADDRESS.toRegex()
     val passwordRegex = ".{6,}".toRegex()
 
-    LazyColumn(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(15.dp)
-    ) {
-        item {
-            BackgroundImageWithTitle("test", "S'inscrire")
-        }
-        item {
-            InputComponent(
-                label = "Prénom",
-                text = firstName,
-                updateText = { firstName = it },
-                onFieldTouched = { firstNameTouched = true }
-            )
-            if (firstNameTouched) {
-                ErrorMessageComponent(
-                    label = firstName,
-                    errorMessage = "Firstname should contain at least 3 characters",
-                    regex = namesRegex
-                )
+    Scaffold(
+        bottomBar = { NavBar() }){ padding->
+        LazyColumn(
+            modifier = Modifier.fillMaxWidth().padding(padding),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(15.dp)
+        ) {
+            item {
+                BackgroundImageWithTitle("test", "S'inscrire")
             }
-        }
-        item {
-            InputComponent(
-                label = "Nom",
-                text = lastName,
-                updateText = { lastName = it },
-                onFieldTouched = { lastNameTouched = true }
-            )
-            if (lastNameTouched) {
-                ErrorMessageComponent(
-                    label = lastName,
-                    errorMessage = "Lastname should contain at least 3 characters",
-                    regex = namesRegex
+            item {
+                InputComponent(
+                    label = "Prénom",
+                    text = firstName,
+                    updateText = { firstName = it },
+                    onFieldTouched = { firstNameTouched = true }
                 )
+                if (firstNameTouched) {
+                    ErrorMessageComponent(
+                        label = firstName,
+                        errorMessage = "Firstname should contain at least 3 characters",
+                        regex = namesRegex
+                    )
+                }
             }
-        }
-        item {
-            InputComponent(
-                label = "Email",
-                text = emailAddress,
-                updateText = { emailAddress = it },
-                onFieldTouched = { emailAddressTouched = true }
-            )
-            if (emailAddressTouched) {
-                ErrorMessageComponent(
-                    label = emailAddress,
-                    errorMessage = "Invalid email address",
-                    regex = emailRegex
+            item {
+                InputComponent(
+                    label = "Nom",
+                    text = lastName,
+                    updateText = { lastName = it },
+                    onFieldTouched = { lastNameTouched = true }
                 )
+                if (lastNameTouched) {
+                    ErrorMessageComponent(
+                        label = lastName,
+                        errorMessage = "Lastname should contain at least 3 characters",
+                        regex = namesRegex
+                    )
+                }
             }
-        }
-        item {
-            PasswordTextField(
-                label = "Mot de passe",
-                text = password,
-                updateText = { password = it },
-                onFieldTouched = { passwordTouched = true }
-            )
-            if (passwordTouched) {
-                ErrorMessageComponent(
-                    label = password,
-                    errorMessage = "Password should contain at least 6 characters",
-                    regex = passwordRegex
+            item {
+                InputComponent(
+                    label = "Email",
+                    text = emailAddress,
+                    updateText = { emailAddress = it },
+                    onFieldTouched = { emailAddressTouched = true }
                 )
+                if (emailAddressTouched) {
+                    ErrorMessageComponent(
+                        label = emailAddress,
+                        errorMessage = "Invalid email address",
+                        regex = emailRegex
+                    )
+                }
             }
-        }
-        item {
-            SignupButtonComponent(signup = {
-                firstNameTouched = true
-                lastNameTouched = true
-                emailAddressTouched = true
-                passwordTouched = true
+            item {
+                PasswordTextField(
+                    label = "Mot de passe",
+                    text = password,
+                    updateText = { password = it },
+                    onFieldTouched = { passwordTouched = true }
+                )
+                if (passwordTouched) {
+                    ErrorMessageComponent(
+                        label = password,
+                        errorMessage = "Password should contain at least 6 characters",
+                        regex = passwordRegex
+                    )
+                }
+            }
+            item {
+                SignupButtonComponent(signup = {
+                    firstNameTouched = true
+                    lastNameTouched = true
+                    emailAddressTouched = true
+                    passwordTouched = true
 
-                if (emailRegex.matches(emailAddress) &&
-                    namesRegex.matches(firstName) &&
-                    namesRegex.matches(lastName) &&
-                    passwordRegex.matches(password)) {
-                    Log.i("MESSAGE", "All fields are valid")
+                    if (emailRegex.matches(emailAddress) &&
+                        namesRegex.matches(firstName) &&
+                        namesRegex.matches(lastName) &&
+                        passwordRegex.matches(password)
+                    ) {
+                        Log.i("MESSAGE", "All fields are valid")
 
-                    coroutineScope.launch {
+                        coroutineScope.launch {
 
-                        val channel = Channel<Boolean>()
+                            val channel = Channel<Boolean>()
 
-                        launch {
-                            val signUpResult = viewModel.signUp(
-                                firstName,
-                                lastName,
-                                emailAddress,
-                                password
-                            )
-                            channel.send(signUpResult)
-                        }
+                            launch {
+                                val signUpResult = viewModel.signUp(
+                                    firstName,
+                                    lastName,
+                                    emailAddress,
+                                    password
+                                )
+                                channel.send(signUpResult)
+                            }
 
-                        val childResult = channel.receive()
+                            val childResult = channel.receive()
 
-                        if (childResult == true) {
-                            navController.navigate(NavigationItem.Login.route)
-                            Log.i("PARENT", "success")
-                            showSuccessMessage = true
-                            showErrorMessage = false
-                        } else {
-                            Log.i("PARENT", "failure")
-                            showErrorMessage = true
-                            showSuccessMessage = false
+                            if (childResult == true) {
+                                navController.navigate(NavigationItem.Login.route)
+                                Log.i("PARENT", "success")
+                                showSuccessMessage = true
+                                showErrorMessage = false
+                            } else {
+                                Log.i("PARENT", "failure")
+                                showErrorMessage = true
+                                showSuccessMessage = false
+                            }
                         }
                     }
-                }
-            })
-        }
-        item {
-            if(showSuccessMessage) {
-                SignUpSuccessResult()
+                })
             }
-            else if(showErrorMessage){
-                SignUpFailureResult()
+            item {
+                if (showSuccessMessage) {
+                    SignUpSuccessResult()
+                } else if (showErrorMessage) {
+                    SignUpFailureResult()
+                }
             }
         }
     }
