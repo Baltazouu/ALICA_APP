@@ -176,11 +176,11 @@ fun PreviewNextEvent(topText:String,
     }
 }
 
-/*@Preview
+@Preview
 @Composable
 fun BackgroundImageWithTitlePreview() {
     BackgroundImageWithTitleAndSubTitle(topText = "le Réseau Alica",title = "Alica Info" , subtitle ="te souhaite la bienvenue !", ressource = R.drawable.bandeau )
-}*/
+}
 
 @Preview
 @Composable

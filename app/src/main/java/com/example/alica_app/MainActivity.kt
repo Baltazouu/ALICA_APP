@@ -13,13 +13,18 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.alica_app.data.models.Alumni
+import com.example.alica_app.data.models.ResponseAuthentication
+import com.example.alica_app.data.models.Role
 import com.example.alica_app.ui.core.NavBar
 import com.example.alica_app.ui.core.TopBar
 import com.example.alica_app.ui.signUp.SignUpScreen
 import com.example.alica_app.ui.event.events.Events
 import com.example.alica_app.ui.home.Home
 import com.example.alica_app.ui.offers.offerList.Offers
+import com.example.alica_app.ui.profile.Profile
 import com.example.alica_app.ui.signIn.SignIn
+import com.example.alica_app.ui.signIn.ViewModelSignIn
 import com.example.alica_app.ui.theme.ALICA_APPTheme
 
 class MainActivity : ComponentActivity() {
@@ -28,6 +33,8 @@ class MainActivity : ComponentActivity() {
         setContent {
 
             ALICA_APPTheme() {
+
+                val authentication =  remember { mutableStateOf(ResponseAuthentication("", "", "", "", "", emptyList())) }
 
                 // TO DO Later : décaler dans le composant AppNavHost
                 // Not working ??? idk why
@@ -49,7 +56,7 @@ class MainActivity : ComponentActivity() {
                         }
                         composable(NavigationItem.SignIn.route) {
                             currentPage = NavigationItem.SignIn.route
-                            SignIn(navController)
+                            SignIn(navController, viewModelSignIn = ViewModelSignIn(),authentication = authentication)
                         }
                         composable(NavigationItem.Home.route) {
                             currentPage = NavigationItem.Home.route
@@ -63,9 +70,12 @@ class MainActivity : ComponentActivity() {
                             currentPage = NavigationItem.Events.route
                             Events(navController)
                         }
+                        composable(NavigationItem.Profile.route){
+
+                            Profile(responseAuthentication = authentication.value)
+                        }
                     }
                 }
-
             }
         }
     }

@@ -16,6 +16,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -37,6 +38,7 @@ import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import com.example.alica_app.NavigationItem
 import com.example.alica_app.R
+import com.example.alica_app.data.models.ResponseAuthentication
 import com.example.alica_app.ui.signUp.InputComponent
 import com.example.alica_app.ui.signUp.PasswordTextField
 import com.example.alica_app.ui.utils.BackgroundImageWithTitle
@@ -47,7 +49,8 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun SignIn(navController: NavController,
-           viewModelSignIn: ViewModelSignIn = ViewModelSignIn()) {
+           viewModelSignIn: ViewModelSignIn = ViewModelSignIn(),
+           authentication: MutableState<ResponseAuthentication>) {
 
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -91,6 +94,8 @@ fun SignIn(navController: NavController,
                         if (result) {
                             isSignIn = true
                             failSignIn = false
+                            authentication.value = viewModelSignIn.signInResponse.value!!
+                            navController.navigate(NavigationItem.Profile.route)
                         } else {
                             isSignIn = false
                             failSignIn = true
