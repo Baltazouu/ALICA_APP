@@ -26,8 +26,8 @@ interface AlumniService {
     @GET("alumnis/{id}")
     fun getAlumni(@Path("id") id:String,
                   @Header("Authorization") token: String): Call<Alumni>
-    @PUT("alumnis/{id}")
-    fun createAlumni(@Path("id") id:String,
+    @PUT("alumnis") // identified by token
+    fun createAlumni(//@Path("id") id:String,
                      @Body alumni: Alumni,
                      @Header("Authorization") token : String): Call<Alumni>
 

@@ -1,19 +1,30 @@
 package com.example.alica_app.ui.profile
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Language
+import androidx.compose.material.icons.filled.ManageAccounts
 import androidx.compose.material3.Button
-import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -28,6 +39,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
@@ -35,18 +48,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.alica_app.NavigationItem
+import com.example.alica_app.R
 import com.example.alica_app.data.models.Alumni
 import com.example.alica_app.data.models.Link
 import com.example.alica_app.data.models.Links
-import com.example.alica_app.data.models.ResponseAuthentication
 import com.example.alica_app.ui.offers.offerDetail.OfferDetail
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
+import kotlin.math.hypot
 
 @Composable
 fun Profile(viewModelProfile: ViewModelProfile,navController: NavController) {
@@ -68,7 +78,7 @@ fun Profile(viewModelProfile: ViewModelProfile,navController: NavController) {
         if (isLoading) {
             Text(text = "Loading")
         } else {
-            ShowProfile(alumni!!,disconnect = {
+            ShowProfile(navController,viewModelProfile,alumni!!,disconnect = {
                 viewModelProfile.disconnect()
                 navController.navigate(NavigationItem.SignIn.route)
             })
@@ -81,7 +91,11 @@ fun Profile(viewModelProfile: ViewModelProfile,navController: NavController) {
 
 
 @Composable
-fun ShowProfile(alumni: Alumni,disconnect:()->Unit = {}) {
+fun ShowProfile(navController: NavController,viewModelProfile: ViewModelProfile,alumni: Alumni,disconnect:()->Unit = {}) {
+
+    val coroutineScope = rememberCoroutineScope()
+
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -94,31 +108,104 @@ fun ShowProfile(alumni: Alumni,disconnect:()->Unit = {}) {
         }
 
         var page by remember { mutableIntStateOf(1) }
-        if (page==1) {
-            LazyRow {
-                item {
-                    Button(onClick = { page=1 }, modifier = Modifier.padding(Dp(10f))) {
-                        Text(text = "Mes informations")
-                    }
-                }
-                item{
-                    FilledTonalButton(onClick = { page=2 }, modifier = Modifier.padding(Dp(10f))) {
-                        Text(text = "Mes offres")
-                    }
-                }
-            }
-            Info(alumni)
-        }
-        else if (page==2){
-            Row {
-                FilledTonalButton(onClick = { page=1 }, modifier = Modifier.padding(Dp(10f))) {
+
+        var editProfileLinks by remember { mutableStateOf(false) }
+
+        var showErrorProfileLinks by remember { mutableStateOf(false) }
+
+
+        LazyRow {
+            item {
+                Button(
+                    onClick = { page = 1 },
+                    modifier = Modifier.padding(Dp(10f)),
+                    colors = ButtonDefaults.buttonColors(contentColor = if (page == 1) Color.Cyan else Color.Black)
+                ) {
                     Text(text = "Mes informations")
                 }
-                Button(onClick = { page=2 }, modifier = Modifier.padding(Dp(10f))) {
+            }
+            item {
+                Button(
+                    onClick = { page = 2 },
+                    modifier = Modifier.padding(Dp(10f)),
+                    colors = ButtonDefaults.buttonColors(contentColor = if (page == 2) Color.Cyan else Color.Black)
+                ) {
                     Text(text = "Mes offres")
                 }
             }
+            item {
+                Button(
+                    onClick = { page = 3 },
+                    modifier = Modifier.padding(Dp(10f)),
+                    colors = ButtonDefaults.buttonColors(contentColor = if (page == 3) Color.Cyan else Color.Black)
+                ) {
+                    Text(text = "Mes événements")
+                }
+            }
+            item {
+                Button(
+                    onClick = { page = 4 },
+                    modifier = Modifier.padding(Dp(10f)),
+                    colors = ButtonDefaults.buttonColors(contentColor = if (page == 4) Color.Cyan else Color.Black)
+                ) {
+                    Text(text = "Mes expériences")
+                }
+            }
+            item {
+                Button(
+                    onClick = { page = 5 },
+                    modifier = Modifier.padding(Dp(10f)),
+                    colors = ButtonDefaults.buttonColors(contentColor = if (page == 5) Color.Cyan else Color.Black)
+                ) {
+                    Text(text = "Mes formations")
+                }
+            }
+        }
+
+
+        if (page==1) {
+
+            Info(alumni, onClick = {
+                editProfileLinks = true
+            })
+
+            if (editProfileLinks) {
+                EditProfileLinks(alumni = alumni, onClick = { updatedGithubURL, updatedLinkedinURL, updatedPortfolioURL ->
+                    editProfileLinks = false
+
+                    coroutineScope.launch {
+
+                        // Mettez à jour les valeurs d'alumni avec les nouvelles valeurs
+                        alumni.githubURL = updatedGithubURL
+                        alumni.linkedinURL = updatedLinkedinURL
+                        alumni.portfolioURL = updatedPortfolioURL
+
+                        val result = viewModelProfile.updateProfile(alumni)
+                        if (result) {
+                            navController.navigate(NavigationItem.Profile.route)
+                        } else {
+                            showErrorProfileLinks = true
+                        }
+                    }
+                })
+            }
+
+            if (showErrorProfileLinks) {
+                Text(text = "Erreur lors de la mise à jour du profil", color = Color.Red)
+            }
+        }
+        else if (page==2){
+
             Offers()
+        }
+        else if (page==3){
+            Text(text = "TODO Evenements")
+        }
+        else if (page==4){
+            ProfileExperiences()
+        }
+        else if (page==5){
+            ProfileFormations()
         }
     }
 }
@@ -142,31 +229,31 @@ fun Offers(){
 }
 
 @Composable
-fun Info(alumni: Alumni){
+fun Info(alumni: Alumni,onClick: () -> Unit = {}){
     Column(modifier = Modifier
         .clip(shape = RoundedCornerShape(Dp(15f)))
         .background(color = Color.LightGray)
         .padding(Dp(10f))
         .fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally) {
-        ProfilObject(alumni.firstName,alumni.lastName,alumni.email)
+        ProfileObject(alumni,onClick = onClick)
     }
 }
 
 @Composable
-fun ProfilObject(firstName: String, lastName: String, email: String){
+fun ProfileObject(alumni: Alumni,onClick: () -> Unit = {}){
     Row (
         modifier = Modifier
             .fillMaxWidth()
             .padding(20.dp),
         verticalAlignment = Alignment.CenterVertically)
     {
-        ProfileImage(firstName) // Passer en paramètre l'image du profil
+        ProfileImage(alumni.firstName) // Passer en paramètre l'image du profil
         Spacer(modifier = Modifier.padding(10.dp))
-        ProfilCaracteristique(firstName,lastName,email) // Passer en paramètre, ou le profil, ou les 3 caractéristique (nom / prenom / metierActuel)
+        ProfileSpecs(alumni.firstName,alumni.lastName,alumni.email) // Passer en paramètre, ou le profil, ou les 3 caractéristique (nom / prenom / metierActuel)
+        ClickableCircleIcon(icon = Icons.Filled.ManageAccounts, onClick = onClick )
     }
-    ProfilExperiences() // Passer en paramètre, ou le profil, ou les caractéristique
-    ProfilFormations() // Passer en paramètre, ou le profil, ou les caractéristique
+    ProfileLinks(alumni.linkedinURL ?: "",alumni.githubURL ?: "",alumni.portfolioURL ?: "")
 }
 
 @Composable
@@ -183,7 +270,7 @@ fun ProfileImage(firstName: String) {
 }
 
 @Composable
-fun ProfilCaracteristique(firstName:String,lastName:String,email:String){
+fun ProfileSpecs(firstName:String, lastName:String, email:String){
     Column {
         Text(text = "$firstName $lastName")
         Text(text = email)
@@ -191,7 +278,7 @@ fun ProfilCaracteristique(firstName:String,lastName:String,email:String){
 }
 
 @Composable
-fun ProfilExperiences(){
+fun ProfileExperiences(){
     Column (modifier = Modifier
         .fillMaxWidth()
         .padding(Dp(10f))){
@@ -205,7 +292,7 @@ fun ProfilExperiences(){
 }
 
 @Composable
-fun ProfilFormations(){
+fun ProfileFormations(){
     Column(modifier = Modifier
         .fillMaxWidth()
         .padding(Dp(10f))) {
@@ -220,11 +307,6 @@ fun ProfilFormations(){
 }
 
 
-@Preview
-@Composable
-fun PreviewProfile(){
-    ShowProfile(alumni = randomAlumni)
-}
 
 val randomAlumni = Alumni(
     id = "123456",
@@ -244,3 +326,99 @@ val randomAlumni = Alumni(
         formations = Link(href = "https://example.com/alumni/123456/formations")
     )
 )
+
+
+@Composable
+fun ClickableCircleIcon(
+    icon: ImageVector,
+    iconSize: Dp = 24.dp,
+    circleSize: Dp = 48.dp,
+    onClick: () -> Unit
+) {
+    Box(
+        modifier = Modifier
+            .padding(15.dp)
+            .size(circleSize)
+            .clickable(onClick = onClick)
+            .background(Color.Cyan, shape = CircleShape),
+        contentAlignment = Alignment.Center
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = null,
+            tint = Color.Black, // Change color as needed
+            modifier = Modifier.size(iconSize)
+        )
+    }
+}
+
+@Composable
+fun ProfileLinks(linkedin:String, github:String, portfolio:String){
+    Column(modifier = Modifier
+        .fillMaxWidth()
+        .padding(Dp(10f))) {
+        Text(text = "Liens :",fontSize = 18.sp, fontWeight = FontWeight.Bold,
+
+        )
+        Row(modifier = Modifier.padding(5.dp)) {
+           // Text(text = "2019-2021 : ")
+            Image(modifier = Modifier.width(20.dp),painter = painterResource(id = R.drawable.github), contentDescription = "github" )
+            Spacer(modifier = Modifier.padding(5.dp))
+            Text(text = github)
+        }
+        Row(modifier = Modifier.padding(5.dp)) {
+            Image(modifier = Modifier.width(20.dp),painter = painterResource(id = R.drawable.linkedin), contentDescription = "linkedin" )
+            Spacer(modifier = Modifier.padding(5.dp))
+            Text(text = linkedin)
+        }
+        Row(modifier = Modifier.padding(5.dp)) {
+            Icon(Icons.Filled.Language, contentDescription = "portfolio")
+            //Image(modifier = Modifier.width(20.dp),painter = painterResource(id = R.drawable.linkedin), contentDescription = "linkedin" )
+            Spacer(modifier = Modifier.padding(5.dp))
+            Text(text = portfolio)
+        }
+    }
+}
+
+
+@Composable
+fun EditProfileLinks(alumni: Alumni,onClick: (String, String, String) -> Unit = { _, _, _ -> }){
+
+
+    var githubURL by remember { mutableStateOf(alumni.githubURL ?: "") }
+    var linkedinURL by remember { mutableStateOf(alumni.linkedinURL ?: "" ) }
+    var portfolioURL by remember { mutableStateOf(alumni.portfolioURL ?: "" ) }
+
+
+    LazyColumn(modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally, contentPadding = PaddingValues(15.dp),
+        verticalArrangement = Arrangement.spacedBy(10.dp))
+    {
+        item {
+            Column {
+                OutlinedTextField(value = githubURL, onValueChange = {githubURL = it},
+                    label = {Text("Github ")})
+            }
+        }
+
+        item {
+            Column {
+                OutlinedTextField(value = linkedinURL, onValueChange = { linkedinURL = it},
+                    label = {Text("Linkedin ")})
+            }
+        }
+        item {
+            Column {
+                OutlinedTextField(value = portfolioURL, onValueChange = { portfolioURL = it},
+                    label = {Text("Portfolio")})
+            }
+        }
+        item {
+            Button(onClick = { onClick(githubURL, linkedinURL, portfolioURL) }, modifier = Modifier.width(150.dp)) {
+                Text("Valider")
+            }
+        }
+    }
+
+}
+

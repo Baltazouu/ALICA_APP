@@ -45,6 +45,33 @@ class ViewModelProfile(private var responseAuthentication: ResponseAuthenticatio
         }
     }
 
+    suspend fun updateProfile(alumni: Alumni): Boolean {
+
+
+        return withContext(Dispatchers.IO) {
+            suspendCoroutine { continuation ->
+                Log.i("PROFILE UPDATE", "before coroutine")
+                service.createAlumni(alumni, String.format("Bearer %s",responseAuthentication.token))
+                    .enqueue(object : retrofit2.Callback<Alumni> {
+                        override fun onResponse(call: retrofit2.Call<Alumni>, response: Response<Alumni>) {
+                            if (response.isSuccessful) {
+                                continuation.resume(true)
+                                Log.i("PROFILE UPDATE", "Profile response: ${response.body()}")
+                            } else {
+                                Log.i("PROFILE UPDATE FAILED","Profile response: ${response.errorBody()}")
+                                continuation.resume(false)
+                            }
+                        }
+
+                        override fun onFailure(call: retrofit2.Call<Alumni>, t: Throwable) {
+                            Log.e("PROFILE FAILURE",t.message,t)
+                            continuation.resume(false)
+                        }
+                    })
+            }
+        }
+    }
+
     fun response(): ResponseAuthentication {
         return responseAuthentication
     }
