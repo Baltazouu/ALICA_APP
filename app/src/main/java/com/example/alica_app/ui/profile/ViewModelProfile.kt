@@ -16,6 +16,8 @@ class ViewModelProfile(val responseAuthentication: ResponseAuthentication): View
 
     private val service = createAlumniRetrofit().create(AlumniService::class.java)
 
+    var alumni: Alumni? = null
+
     suspend fun getProfile(): Boolean {
         return withContext(Dispatchers.IO) {
             suspendCoroutine { continuation ->
@@ -24,6 +26,8 @@ class ViewModelProfile(val responseAuthentication: ResponseAuthentication): View
                         override fun onResponse(call: retrofit2.Call<Alumni>, response: Response<Alumni>) {
                             if (response.isSuccessful) {
                                 continuation.resume(true)
+                                alumni = response.body()
+
                                 Log.i("SUCCESS", "Profile response: ${response.body()}")
                             } else {
                                 continuation.resume(false)
@@ -41,5 +45,9 @@ class ViewModelProfile(val responseAuthentication: ResponseAuthentication): View
 
     fun response(): ResponseAuthentication {
         return responseAuthentication
+    }
+
+    fun alumni(): Alumni? {
+        return alumni
     }
 }
