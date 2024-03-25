@@ -9,11 +9,13 @@ import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -27,12 +29,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import com.example.alica_app.NavigationItem
 import com.example.alica_app.data.models.Alumni
 import com.example.alica_app.data.models.Link
 import com.example.alica_app.data.models.Links
@@ -44,7 +49,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
 
 @Composable
-fun Profile(viewModelProfile: ViewModelProfile) {
+fun Profile(viewModelProfile: ViewModelProfile,navController: NavController) {
     val coroutineScope = rememberCoroutineScope()
     var isLoading by remember { mutableStateOf(true) }
     var alumni by remember { mutableStateOf<Alumni?>(null) }
@@ -63,12 +68,10 @@ fun Profile(viewModelProfile: ViewModelProfile) {
         if (isLoading) {
             Text(text = "Loading")
         } else {
-            ShowProfile(alumni!!)
-        }
-
-        Column(modifier = Modifier.fillMaxSize()) {
-            Text(text = "Connected : ")
-            Text(text = viewModelProfile.responseAuthentication.email)
+            ShowProfile(alumni!!,disconnect = {
+                viewModelProfile.disconnect()
+                navController.navigate(NavigationItem.SignIn.route)
+            })
         }
     }
 }
@@ -78,21 +81,30 @@ fun Profile(viewModelProfile: ViewModelProfile) {
 
 
 @Composable
-fun ShowProfile(alumni: Alumni) {
+fun ShowProfile(alumni: Alumni,disconnect:()->Unit = {}) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(Dp(10f)), horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(text = "Mon profil")
+        Text(text = "Mon profil", fontWeight = FontWeight.Bold, fontSize = 20.sp)
+
+        TextButton(onClick = disconnect, modifier = Modifier.padding(Dp(10f))) {
+            Text(text = "Déconnexion")
+        }
+
         var page by remember { mutableIntStateOf(1) }
         if (page==1) {
-            Row {
-                Button(onClick = { page=1 }, modifier = Modifier.padding(Dp(10f))) {
-                    Text(text = "Mes informations")
+            LazyRow {
+                item {
+                    Button(onClick = { page=1 }, modifier = Modifier.padding(Dp(10f))) {
+                        Text(text = "Mes informations")
+                    }
                 }
-                FilledTonalButton(onClick = { page=2 }, modifier = Modifier.padding(Dp(10f))) {
-                    Text(text = "Mes offres")
+                item{
+                    FilledTonalButton(onClick = { page=2 }, modifier = Modifier.padding(Dp(10f))) {
+                        Text(text = "Mes offres")
+                    }
                 }
             }
             Info(alumni)

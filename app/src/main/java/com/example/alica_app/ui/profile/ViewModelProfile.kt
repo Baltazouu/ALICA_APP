@@ -12,7 +12,7 @@ import retrofit2.Response
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
-class ViewModelProfile(val responseAuthentication: ResponseAuthentication): ViewModel() {
+class ViewModelProfile(private var responseAuthentication: ResponseAuthentication): ViewModel() {
 
     private val service = createAlumniRetrofit().create(AlumniService::class.java)
 
@@ -51,5 +51,10 @@ class ViewModelProfile(val responseAuthentication: ResponseAuthentication): View
 
     fun alumni(): Alumni? {
         return alumni
+    }
+
+    fun disconnect() {
+        responseAuthentication.token = ""
+        alumni = null
     }
 }

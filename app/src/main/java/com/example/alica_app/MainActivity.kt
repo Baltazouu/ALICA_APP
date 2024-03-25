@@ -41,7 +41,6 @@ class MainActivity : ComponentActivity() {
 
                 var currentPage by remember { mutableStateOf(NavigationItem.SignIn.route) }
 
-
                 Scaffold(
                     topBar = { TopBar(navController,currentPage)},
                     bottomBar = {NavBar(navController = navController)}
@@ -70,7 +69,12 @@ class MainActivity : ComponentActivity() {
                             Events(navController)
                         }
                         composable(NavigationItem.Profile.route){
-                            Profile(viewModelProfile = ViewModelProfile(authentication.value))
+                            currentPage = NavigationItem.Profile.route
+
+                            if(authentication.value.token.isEmpty()){
+                                navController.navigate(NavigationItem.SignIn.route)
+                            }
+                            Profile(viewModelProfile = ViewModelProfile(authentication.value),navController = navController)
                         }
                     }
                 }
