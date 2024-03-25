@@ -16,9 +16,9 @@ import androidx.navigation.compose.rememberNavController
 import com.example.alica_app.data.models.Alumni
 import com.example.alica_app.data.models.ResponseAuthentication
 import com.example.alica_app.data.models.Role
+import com.example.alica_app.ui.SignUp.SignUpScreen
 import com.example.alica_app.ui.core.NavBar
 import com.example.alica_app.ui.core.TopBar
-import com.example.alica_app.ui.signUp.SignUpScreen
 import com.example.alica_app.ui.event.events.Events
 import com.example.alica_app.ui.home.Home
 import com.example.alica_app.ui.offers.offerList.Offers

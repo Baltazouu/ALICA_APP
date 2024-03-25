@@ -39,8 +39,8 @@ import coil.compose.AsyncImage
 import com.example.alica_app.NavigationItem
 import com.example.alica_app.R
 import com.example.alica_app.data.models.ResponseAuthentication
-import com.example.alica_app.ui.signUp.InputComponent
-import com.example.alica_app.ui.signUp.PasswordTextField
+import com.example.alica_app.ui.SignUp.InputComponent
+import com.example.alica_app.ui.SignUp.PasswordTextField
 import com.example.alica_app.ui.utils.BackgroundImageWithTitle
 import com.google.android.gms.wallet.button.ButtonConstants
 import kotlinx.coroutines.channels.Channel
