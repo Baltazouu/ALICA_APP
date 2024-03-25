@@ -21,21 +21,23 @@ class ViewModelProfile(val responseAuthentication: ResponseAuthentication): View
     suspend fun getProfile(): Boolean {
         return withContext(Dispatchers.IO) {
             suspendCoroutine { continuation ->
-                service.getAlumni(responseAuthentication.id, responseAuthentication.token)
+                service.getAlumni(responseAuthentication.id, String.format("Bearer %s",responseAuthentication.token))
                     .enqueue(object : retrofit2.Callback<Alumni> {
                         override fun onResponse(call: retrofit2.Call<Alumni>, response: Response<Alumni>) {
                             if (response.isSuccessful) {
                                 continuation.resume(true)
                                 alumni = response.body()
 
-                                Log.i("SUCCESS", "Profile response: ${response.body()}")
+                                Log.i("PROFILE", "Profile response: ${response.body()}")
                             } else {
+                                Log.i("PROFILE  FAILED","Profile response: ${response.errorBody()}")
+                                Log.i("PROFILE FAILED",response.toString())
                                 continuation.resume(false)
                             }
                         }
 
                         override fun onFailure(call: retrofit2.Call<Alumni>, t: Throwable) {
-                            Log.e("Error",t.message,t)
+                            Log.e("PROFILE FAILURE",t.message,t)
                             continuation.resume(false)
                         }
                     })

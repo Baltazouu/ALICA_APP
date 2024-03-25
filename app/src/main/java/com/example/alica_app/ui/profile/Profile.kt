@@ -32,58 +32,48 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.alica_app.data.models.Alumni
 import com.example.alica_app.data.models.Link
 import com.example.alica_app.data.models.Links
 import com.example.alica_app.data.models.ResponseAuthentication
 import com.example.alica_app.ui.offers.offerDetail.OfferDetail
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
 
 @Composable
-fun Profile(viewModelProfile: ViewModelProfile ) {
-
+fun Profile(viewModelProfile: ViewModelProfile) {
     val coroutineScope = rememberCoroutineScope()
-
-    var showProfile by remember { mutableStateOf(false) }
+    var isLoading by remember { mutableStateOf(true) }
+    var alumni by remember { mutableStateOf<Alumni?>(null) }
 
     LaunchedEffect(Unit) {
         coroutineScope.launch {
-            val channel = Channel<Boolean>();
-
-            launch {
-
-                val result = viewModelProfile.getProfile();
-                channel.send(result);
-            }
-            val result = channel.receive();
-
-            if(result) {
-                showProfile = true;
+            val result = viewModelProfile.getProfile()
+            if (result) {
+                isLoading = false
+                alumni = viewModelProfile.alumni
             }
         }
-
-
-    }
-    if(showProfile){
-        ShowProfile(viewModelProfile.alumni!!)
-    }
-    else{
-        Text(text = "Loading")
     }
 
-   /* coroutineScope.launch {
-        viewModelProfile.getProfile();
-    }*/
+    Column {
+        if (isLoading) {
+            Text(text = "Loading")
+        } else {
+            ShowProfile(alumni!!)
+        }
 
-
-    Column(modifier = Modifier.fillMaxSize()) {
-
-        Text(text = "Connected : ")
-        Text(text = viewModelProfile.responseAuthentication.email);
+        Column(modifier = Modifier.fillMaxSize()) {
+            Text(text = "Connected : ")
+            Text(text = viewModelProfile.responseAuthentication.email)
+        }
     }
 }
+
+
 
 
 
@@ -134,7 +124,7 @@ fun Offers(){
             fontSize = 18.sp,
             style = TextStyle(textDecoration = TextDecoration.Underline)
         )
-        OfferDetail() // Modifier avec des vraies offres
+        OfferDetail()
         OfferDetail()
     }
 }
@@ -220,7 +210,7 @@ fun ProfilFormations(){
 
 @Preview
 @Composable
-fun previewProfile(){
+fun PreviewProfile(){
     ShowProfile(alumni = randomAlumni)
 }
 
