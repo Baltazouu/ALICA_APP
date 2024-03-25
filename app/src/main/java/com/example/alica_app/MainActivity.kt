@@ -23,6 +23,7 @@ import com.example.alica_app.ui.event.events.Events
 import com.example.alica_app.ui.home.Home
 import com.example.alica_app.ui.offers.offerList.Offers
 import com.example.alica_app.ui.profile.Profile
+import com.example.alica_app.ui.profile.ViewModelProfile
 import com.example.alica_app.ui.signIn.SignIn
 import com.example.alica_app.ui.signIn.ViewModelSignIn
 import com.example.alica_app.ui.theme.ALICA_APPTheme
@@ -36,8 +37,6 @@ class MainActivity : ComponentActivity() {
 
                 val authentication =  remember { mutableStateOf(ResponseAuthentication("", "", "", "", "", emptyList())) }
 
-                // TO DO Later : décaler dans le composant AppNavHost
-                // Not working ??? idk why
                 val navController = rememberNavController()
 
                 var currentPage by remember { mutableStateOf(NavigationItem.SignIn.route) }
@@ -71,8 +70,7 @@ class MainActivity : ComponentActivity() {
                             Events(navController)
                         }
                         composable(NavigationItem.Profile.route){
-
-                            Profile(responseAuthentication = authentication.value)
+                            Profile(viewModelProfile = ViewModelProfile(authentication.value))
                         }
                     }
                 }

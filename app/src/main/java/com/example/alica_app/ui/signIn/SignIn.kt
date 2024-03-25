@@ -54,8 +54,6 @@ fun SignIn(navController: NavController,
 
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-
-    var isSignIn by remember { mutableStateOf(false) }
     var failSignIn by remember { mutableStateOf(false) }
 
     val coroutineScope = rememberCoroutineScope()
@@ -74,36 +72,32 @@ fun SignIn(navController: NavController,
         if(failSignIn){
             Text(text = "Email ou mot de passe incorrect", color = Color.Red)
         }
+        Button(
+            colors = ButtonDefaults.buttonColors(containerColor = colorResource(id = R.color.alica_blue)),
+            onClick = {
 
-        if(!isSignIn) {
-            Button(
-                colors = ButtonDefaults.buttonColors(containerColor = colorResource(id = R.color.alica_blue)),
-                onClick = {
+                coroutineScope.launch {
 
-                    coroutineScope.launch {
+                    val channel = Channel<Boolean>()
 
-                        val channel = Channel<Boolean>()
-
-                        launch {
-                            val signInResult = viewModelSignIn.signIn(email, password)
-                            channel.send(signInResult)
-                        }
-
-                        val result = channel.receive();
-
-                        if (result) {
-                            isSignIn = true
-                            failSignIn = false
-                            authentication.value = viewModelSignIn.signInResponse.value!!
-                            navController.navigate(NavigationItem.Profile.route)
-                        } else {
-                            isSignIn = false
-                            failSignIn = true
-                        }
+                    launch {
+                        val signInResult = viewModelSignIn.signIn(email, password)
+                        channel.send(signInResult)
                     }
 
-                }) {
-                Text(text = "Connexion")
+                    val result = channel.receive();
+
+                    if (result) {
+                        failSignIn = false
+                        authentication.value = viewModelSignIn.signInResponse.value!!
+                        navController.navigate(NavigationItem.Profile.route)
+                    } else {
+                        failSignIn = true
+                    }
+                }
+
+            }) {
+            Text(text = "Connexion")
             }
 
             Text(text = "Pas encore Inscrit ?", fontSize = 18.sp)
@@ -111,10 +105,7 @@ fun SignIn(navController: NavController,
                 Text(text = "S'inscrire", color = colorResource(id = R.color.alica_blue))
 
             }
-        }
-        else{
-            Text(text = "Connexion réussie", fontSize = 20.sp)
-        }
+
     }
 }
 
