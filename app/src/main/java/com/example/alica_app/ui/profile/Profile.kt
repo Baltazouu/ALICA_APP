@@ -170,7 +170,7 @@ fun ShowProfile(navController: NavController,viewModelProfile: ViewModelProfile,
 
                 item{
                     Info(alumni, onClick = {
-                        editProfileLinks = true
+                        editProfileLinks = !editProfileLinks
                     })
                 }
 

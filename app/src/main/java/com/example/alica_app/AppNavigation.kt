@@ -6,6 +6,7 @@ import androidx.compose.material.icons.filled.AppRegistration
 import androidx.compose.material.icons.filled.Event
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Login
+import androidx.compose.material.icons.filled.VerifiedUser
 import androidx.compose.material.icons.filled.WorkHistory
 import androidx.compose.ui.graphics.vector.ImageVector
 
@@ -15,7 +16,8 @@ enum class Screen {
     SIGNUP,
     EVENTS,
     OFFERS,
-    PROFILE
+    PROFILE,
+    ALUMNIS
 
 }
 sealed class NavigationItem(val route: String,val icon: ImageVector) {
@@ -26,4 +28,5 @@ sealed class NavigationItem(val route: String,val icon: ImageVector) {
     object Events : NavigationItem(Screen.EVENTS.name,Icons.Filled.Event)
     object Offers : NavigationItem(Screen.OFFERS.name,Icons.Filled.WorkHistory)
     object Profile : NavigationItem(Screen.PROFILE.name,Icons.Filled.AccountCircle)
+    object Alumnis : NavigationItem(Screen.ALUMNIS.name,Icons.Filled.VerifiedUser)
 }

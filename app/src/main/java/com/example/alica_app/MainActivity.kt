@@ -17,6 +17,7 @@ import com.example.alica_app.data.models.Alumni
 import com.example.alica_app.data.models.ResponseAuthentication
 import com.example.alica_app.data.models.Role
 import com.example.alica_app.ui.SignUp.SignUpScreen
+import com.example.alica_app.ui.alumnis.Alumnis
 import com.example.alica_app.ui.core.NavBar
 import com.example.alica_app.ui.core.TopBar
 import com.example.alica_app.ui.event.events.Events
@@ -69,12 +70,16 @@ class MainActivity : ComponentActivity() {
                             Events(navController)
                         }
                         composable(NavigationItem.Profile.route){
-                            currentPage = NavigationItem.Profile.route
+                           currentPage = NavigationItem.Profile.route
 
                             if(authentication.value.token.isEmpty()){
                                 navController.navigate(NavigationItem.SignIn.route)
                             }
                             Profile(viewModelProfile = ViewModelProfile(authentication.value),navController = navController)
+                        }
+                        composable(NavigationItem.Alumnis.route){
+                            currentPage = NavigationItem.Alumnis.route
+                            Alumnis(navController = navController)
                         }
                     }
                 }
