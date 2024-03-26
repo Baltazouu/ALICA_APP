@@ -113,6 +113,7 @@ fun ShowProfile(navController: NavController,viewModelProfile: ViewModelProfile,
 
         var showErrorProfileLinks by remember { mutableStateOf(false) }
 
+        var showSuccesProfileLinks by remember { mutableStateOf(false) }
 
         LazyRow {
             item {
@@ -165,33 +166,52 @@ fun ShowProfile(navController: NavController,viewModelProfile: ViewModelProfile,
 
         if (page==1) {
 
-            Info(alumni, onClick = {
-                editProfileLinks = true
-            })
+            LazyColumn(Modifier.background(Color.LightGray)) {
+
+                item{
+                    Info(alumni, onClick = {
+                        editProfileLinks = true
+                    })
+                }
+
+
+
 
             if (editProfileLinks) {
-                EditProfileLinks(alumni = alumni, onClick = { updatedGithubURL, updatedLinkedinURL, updatedPortfolioURL ->
-                    editProfileLinks = false
 
-                    coroutineScope.launch {
+                item {
+                    EditProfileLinks(alumni = alumni, onClick = { updatedGithubURL, updatedLinkedinURL, updatedPortfolioURL ->
+                        editProfileLinks = false
 
-                        // Mettez à jour les valeurs d'alumni avec les nouvelles valeurs
-                        alumni.githubURL = updatedGithubURL
-                        alumni.linkedinURL = updatedLinkedinURL
-                        alumni.portfolioURL = updatedPortfolioURL
+                        coroutineScope.launch {
 
-                        val result = viewModelProfile.updateProfile(alumni)
-                        if (result) {
-                            navController.navigate(NavigationItem.Profile.route)
-                        } else {
-                            showErrorProfileLinks = true
+                            // Mettez à jour les valeurs d'alumni avec les nouvelles valeurs
+                            alumni.githubURL = updatedGithubURL
+                            alumni.linkedinURL = updatedLinkedinURL
+                            alumni.portfolioURL = updatedPortfolioURL
+
+                            val result = viewModelProfile.updateProfile(alumni)
+                            if (result) {
+                                //navController.navigate(NavigationItem.Profile.route)
+                                showSuccesProfileLinks = true
+                                showErrorProfileLinks = false
+                            } else {
+                                showErrorProfileLinks = true
+                                showSuccesProfileLinks = false
+                            }
                         }
-                    }
-                })
+                    })
+                }
+            }
+
             }
 
             if (showErrorProfileLinks) {
                 Text(text = "Erreur lors de la mise à jour du profil", color = Color.Red)
+            }
+            if(showSuccesProfileLinks){
+                Text(text = "Profil mis à jour avec succès", color = Color.Green)
+
             }
         }
         else if (page==2){
@@ -389,36 +409,29 @@ fun EditProfileLinks(alumni: Alumni,onClick: (String, String, String) -> Unit = 
     var linkedinURL by remember { mutableStateOf(alumni.linkedinURL ?: "" ) }
     var portfolioURL by remember { mutableStateOf(alumni.portfolioURL ?: "" ) }
 
+    Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(10.dp), horizontalAlignment = Alignment.CenterHorizontally) {
 
-    LazyColumn(modifier = Modifier.fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally, contentPadding = PaddingValues(15.dp),
-        verticalArrangement = Arrangement.spacedBy(10.dp))
-    {
-        item {
-            Column {
-                OutlinedTextField(value = githubURL, onValueChange = {githubURL = it},
-                    label = {Text("Github ")})
-            }
+        OutlinedTextField(value = githubURL, onValueChange = {githubURL = it},
+            label = {Text("Github ")})
+
+        OutlinedTextField(value = linkedinURL, onValueChange = { linkedinURL = it},
+                label = {Text("Linkedin ")})
+
+        OutlinedTextField(value = portfolioURL, onValueChange = { portfolioURL = it},
+            label = {Text("Portfolio")})
+
+        Button(onClick = { onClick(githubURL, linkedinURL, portfolioURL) }, modifier = Modifier.width(150.dp)) {
+            Text("Valider")
         }
 
-        item {
-            Column {
-                OutlinedTextField(value = linkedinURL, onValueChange = { linkedinURL = it},
-                    label = {Text("Linkedin ")})
-            }
-        }
-        item {
-            Column {
-                OutlinedTextField(value = portfolioURL, onValueChange = { portfolioURL = it},
-                    label = {Text("Portfolio")})
-            }
-        }
-        item {
-            Button(onClick = { onClick(githubURL, linkedinURL, portfolioURL) }, modifier = Modifier.width(150.dp)) {
-                Text("Valider")
-            }
-        }
+
     }
 
 }
 
+
+@Preview
+@Composable
+fun PreviewProfile(){
+    EditProfileLinks(alumni = randomAlumni)
+}
