@@ -1,17 +1,18 @@
 package com.example.alica_app.ui.profile
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -24,10 +25,15 @@ import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.ManageAccounts
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerFormatter
+import androidx.compose.material3.DisplayMode
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -50,14 +56,15 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.example.alica_app.NavigationItem
 import com.example.alica_app.R
 import com.example.alica_app.data.models.Alumni
 import com.example.alica_app.data.models.Link
 import com.example.alica_app.data.models.Links
+import com.example.alica_app.data.models.ResponseAuthentication
 import com.example.alica_app.ui.offers.offerDetail.OfferDetail
 import kotlinx.coroutines.launch
-import kotlin.math.hypot
 
 @Composable
 fun Profile(viewModelProfile: ViewModelProfile,navController: NavController) {
@@ -101,7 +108,7 @@ fun ShowProfile(navController: NavController,viewModelProfile: ViewModelProfile,
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(Dp(10f)), horizontalAlignment = Alignment.CenterHorizontally
+            .padding(Dp(10f)), horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text(text = "Mon profil", fontWeight = FontWeight.Bold, fontSize = 20.sp)
 
@@ -115,7 +122,7 @@ fun ShowProfile(navController: NavController,viewModelProfile: ViewModelProfile,
 
         var showErrorProfileLinks by remember { mutableStateOf(false) }
 
-        var showSuccesProfileLinks by remember { mutableStateOf(false) }
+        var showSuccessProfileLinks by remember { mutableStateOf(false) }
 
         LazyRow {
             item {
@@ -168,51 +175,62 @@ fun ShowProfile(navController: NavController,viewModelProfile: ViewModelProfile,
 
         if (page==1) {
 
-            LazyColumn(Modifier.background(Color.LightGray)) {
+
+            LazyColumn(
+                Modifier
+                    .fillMaxSize()
+                    ) {
 
                 item{
-                    Info(alumni, onClick = {
-                        editProfileLinks = !editProfileLinks
-                    })
-                }
+                    Column(modifier = Modifier.border(1.dp, Color.Black, RoundedCornerShape(10.dp))
+                    ){
+                        Info(alumni, onClick = {
+                            editProfileLinks = !editProfileLinks
+                        })
+                        if (editProfileLinks) {
 
 
+                                EditProfileLinks(alumni = alumni, onClick = { updatedGithubURL, updatedLinkedinURL, updatedPortfolioURL,entryYear ->
+                                    editProfileLinks = false
 
+                                    coroutineScope.launch {
 
-            if (editProfileLinks) {
+                                        // Mettez à jour les valeurs d'alumni avec les nouvelles valeurs
+                                        alumni.githubURL = updatedGithubURL
+                                        alumni.linkedinURL = updatedLinkedinURL
+                                        alumni.portfolioURL = updatedPortfolioURL
+                                        alumni.entryYear = entryYear
 
-                item {
-                    EditProfileLinks(alumni = alumni, onClick = { updatedGithubURL, updatedLinkedinURL, updatedPortfolioURL ->
-                        editProfileLinks = false
+                                        val result = viewModelProfile.updateProfile(alumni)
+                                        if (result) {
+                                            //navController.navigate(NavigationItem.Profile.route)
+                                            showSuccessProfileLinks = true
+                                            showErrorProfileLinks = false
+                                        } else {
+                                            showErrorProfileLinks = true
+                                            showSuccessProfileLinks = false
+                                        }
+                                    }
+                                })
 
-                        coroutineScope.launch {
-
-                            // Mettez à jour les valeurs d'alumni avec les nouvelles valeurs
-                            alumni.githubURL = updatedGithubURL
-                            alumni.linkedinURL = updatedLinkedinURL
-                            alumni.portfolioURL = updatedPortfolioURL
-
-                            val result = viewModelProfile.updateProfile(alumni)
-                            if (result) {
-                                //navController.navigate(NavigationItem.Profile.route)
-                                showSuccesProfileLinks = true
-                                showErrorProfileLinks = false
-                            } else {
-                                showErrorProfileLinks = true
-                                showSuccesProfileLinks = false
-                            }
                         }
-                    })
+
+                        if (showErrorProfileLinks) {
+                            Text(text = "Erreur lors de la mise à jour du profil", color = Color.Red)
+                        }
+                        if(showSuccessProfileLinks){
+                            Text(text = "Profil mis à jour avec succès", color = Color.Green)
+
+                        }
+
+                    }
+
                 }
-            }
 
-            }
 
-            if (showErrorProfileLinks) {
-                Text(text = "Erreur lors de la mise à jour du profil", color = Color.Red)
-            }
-            if(showSuccesProfileLinks){
-                Text(text = "Profil mis à jour avec succès", color = Color.Green)
+
+
+
 
             }
         }
@@ -260,10 +278,10 @@ fun Offers(){
 fun Info(alumni: Alumni,onClick: () -> Unit = {}){
     Column(modifier = Modifier
         .clip(shape = RoundedCornerShape(Dp(15f)))
-        .background(color = Color.LightGray)
+        //.background(color = Color.LightGray)
         .padding(Dp(10f))
         .fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally) {
+        horizontalAlignment = Alignment.Start) {
         ProfileObject(alumni,onClick = onClick)
     }
 }
@@ -281,7 +299,7 @@ fun ProfileObject(alumni: Alumni,onClick: () -> Unit = {}){
         ProfileSpecs(alumni.firstName,alumni.lastName,alumni.email) // Passer en paramètre, ou le profil, ou les 3 caractéristique (nom / prenom / metierActuel)
         ClickableCircleIcon(icon = Icons.Filled.ManageAccounts, onClick = onClick )
     }
-    ProfileLinks(alumni.linkedinURL ?: "",alumni.githubURL ?: "",alumni.portfolioURL ?: "")
+    ProfileLinks(alumni.linkedinURL ?: "",alumni.githubURL ?: "",alumni.portfolioURL ?: "",alumni.entryYear ?: "")
 }
 
 @Composable
@@ -289,7 +307,7 @@ fun ProfileImage(firstName: String) {
     Box(modifier = Modifier
         .clip(shape = CircleShape)
         .defaultMinSize(60.dp, 60.dp)
-        .background(color = Color.White)) {
+        .background(color = Color.LightGray)) {
         Text(text = firstName.first().toString(), fontSize = 35.sp,
             color = Color.Black,
             modifier = Modifier.padding(start = 18.dp, top = 5.dp)
@@ -340,7 +358,7 @@ val randomAlumni = Alumni(
     id = "123456",
     email = "john.doe@example.com",
     role = "Software Engineer",
-    entryYear = 2015,
+    entryYear = "2015/2016",
     firstName = "John",
     lastName = "Doe",
     linkedinURL = "https://www.linkedin.com/in/johndoe",
@@ -381,10 +399,14 @@ fun ClickableCircleIcon(
 }
 
 @Composable
-fun ProfileLinks(linkedin:String, github:String, portfolio:String){
+fun ProfileLinks(linkedin:String, github:String, portfolio:String,entryYear:String){
     Column(modifier = Modifier
         .fillMaxWidth()
         .padding(Dp(10f))) {
+        
+        Text(text = String.format("Année d'entrée : %s",entryYear),fontSize = 18.sp, fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(5.dp))}
+        
         Text(text = "Liens :",fontSize = 18.sp, fontWeight = FontWeight.Bold,
 
         )
@@ -405,17 +427,18 @@ fun ProfileLinks(linkedin:String, github:String, portfolio:String){
             Spacer(modifier = Modifier.padding(5.dp))
             Text(text = portfolio)
         }
-    }
+
 }
 
 
 @Composable
-fun EditProfileLinks(alumni: Alumni,onClick: (String, String, String) -> Unit = { _, _, _ -> }){
+fun EditProfileLinks(alumni: Alumni,onClick: (String, String, String,String) -> Unit = { _, _, _,_ -> }){
 
 
     var githubURL by remember { mutableStateOf(alumni.githubURL ?: "") }
     var linkedinURL by remember { mutableStateOf(alumni.linkedinURL ?: "" ) }
     var portfolioURL by remember { mutableStateOf(alumni.portfolioURL ?: "" ) }
+    var entryYear by remember { mutableStateOf(alumni.entryYear.toString()) }
 
     Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(10.dp), horizontalAlignment = Alignment.CenterHorizontally) {
 
@@ -428,7 +451,11 @@ fun EditProfileLinks(alumni: Alumni,onClick: (String, String, String) -> Unit = 
         OutlinedTextField(value = portfolioURL, onValueChange = { portfolioURL = it},
             label = {Text("Portfolio")})
 
-        Button(onClick = { onClick(githubURL, linkedinURL, portfolioURL) }, modifier = Modifier.width(150.dp)) {
+
+        OutlinedTextField(value = entryYear, onValueChange = {entryYear = it },
+            label = { Text("Année d'entrée") })
+
+        Button(onClick = { onClick(githubURL, linkedinURL, portfolioURL,entryYear) }, modifier = Modifier.width(150.dp)) {
             Text("Valider")
         }
 
@@ -437,9 +464,47 @@ fun EditProfileLinks(alumni: Alumni,onClick: (String, String, String) -> Unit = 
 
 }
 
+val randomResponse = ResponseAuthentication(
+    "",
+    "",
+    "",
+    "",
+    "",
+    emptyList()
+)
 
 @Preview
 @Composable
-fun PreviewProfile(){
-    EditProfileLinks(alumni = randomAlumni)
+fun PreviewProfile() {
+    ShowProfile(navController = rememberNavController(),viewModelProfile = ViewModelProfile(
+        randomResponse),alumni = randomAlumni)
 }
+
+
+/*
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Preview
+@Composable
+fun PreviewProfile() {
+    val state = rememberDatePickerState(initialDisplayMode = DisplayMode.Input)
+
+    Column(
+        modifier = Modifier.padding(16.dp)
+    ) {
+        EditProfileLinks(alumni = randomAlumni)
+        DatePicker(
+            dateFormatter = DatePickerFormatter("dd/MM/yyyy"),
+            state = state,
+            modifier = Modifier.padding(vertical = 8.dp)
+        )
+
+        Text(
+            "Entered date timestamp: ${state.selectedDateMillis ?: "no input"}",
+            modifier = Modifier.align(Alignment.CenterHorizontally)
+        )
+    }
+}
+*/
+
+

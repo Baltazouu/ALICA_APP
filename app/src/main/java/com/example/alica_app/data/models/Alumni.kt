@@ -8,7 +8,7 @@ data class Alumni(
     val id: String,
     val email: String,
     val role: String? = null,
-    val entryYear: Int? = null,
+    var entryYear: String? = null,
     val firstName: String,
     val lastName: String,
     var linkedinURL: String? = null,
