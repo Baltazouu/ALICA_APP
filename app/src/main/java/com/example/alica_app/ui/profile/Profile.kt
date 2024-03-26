@@ -1,5 +1,6 @@
 package com.example.alica_app.ui.profile
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -63,6 +64,7 @@ fun Profile(viewModelProfile: ViewModelProfile,navController: NavController) {
     val coroutineScope = rememberCoroutineScope()
     var isLoading by remember { mutableStateOf(true) }
     var alumni by remember { mutableStateOf<Alumni?>(null) }
+
 
     LaunchedEffect(Unit) {
         coroutineScope.launch {
@@ -243,8 +245,14 @@ fun Offers(){
             fontSize = 18.sp,
             style = TextStyle(textDecoration = TextDecoration.Underline)
         )
-        OfferDetail()
-        OfferDetail()
+        LazyColumn {
+            item {
+                OfferDetail()
+            }
+            item {
+                OfferDetail()
+            }
+        }
     }
 }
 

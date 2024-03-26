@@ -21,9 +21,15 @@ class ViewModelProfile(private var responseAuthentication: ResponseAuthenticatio
     suspend fun getProfile(): Boolean {
         return withContext(Dispatchers.IO) {
             suspendCoroutine { continuation ->
+
+                Log.i("Profile token : ",responseAuthentication.token)
+
                 service.getAlumni(responseAuthentication.id, String.format("Bearer %s",responseAuthentication.token))
                     .enqueue(object : retrofit2.Callback<Alumni> {
                         override fun onResponse(call: retrofit2.Call<Alumni>, response: Response<Alumni>) {
+
+                            Log.i("RESPONSE",response.toString())
+
                             if (response.isSuccessful) {
                                 continuation.resume(true)
                                 alumni = response.body()

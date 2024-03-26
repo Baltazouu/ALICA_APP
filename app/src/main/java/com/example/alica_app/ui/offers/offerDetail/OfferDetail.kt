@@ -22,7 +22,30 @@ import coil.compose.AsyncImage
 @Preview
 @Composable
 fun OfferDetail() {
-    LazyColumn(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+
+    Column {
+        AsyncImage(
+            model = "https://www.achetezenauvergne.fr/img/openium-logo-1644241059214.jpg",
+            contentDescription = "Translated description of what the image contains",
+            modifier = Modifier
+                .height(70.dp)
+                .width(70.dp))
+        Text(text = "Stage : Développeur Android F/H", fontSize = 20.sp)
+        Text(text = "Clermont-Ferrand")
+        Row(modifier = Modifier.padding(30.dp), horizontalArrangement = Arrangement.spacedBy(15.dp)) {
+            Column {
+                offerSpec(text = "Stage")
+            }
+            Column {
+                offerSpec(text = "Etudes : Bac+3")
+            }
+            Column {
+                offerSpec("Experience : Junior")
+            }
+        }
+    }
+
+    /*LazyColumn(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
 
         item {
             AsyncImage(
@@ -52,7 +75,7 @@ fun OfferDetail() {
                 }
             }
         }
-    }
+    }*/
 
 }
 
