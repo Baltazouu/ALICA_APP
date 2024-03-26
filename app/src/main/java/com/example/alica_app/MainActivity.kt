@@ -21,6 +21,7 @@ import com.example.alica_app.ui.core.TopBar
 import com.example.alica_app.ui.event.events.Events
 import com.example.alica_app.ui.home.Home
 import com.example.alica_app.ui.offers.offerList.Offers
+import com.example.alica_app.ui.profile.AddExperience
 import com.example.alica_app.ui.profile.Profile
 import com.example.alica_app.ui.profile.ViewModelProfile
 import com.example.alica_app.ui.signIn.SignIn
@@ -112,6 +113,10 @@ class MainActivity : ComponentActivity() {
                         composable(NavigationItem.Alumnis.route) {
                             currentPage = NavigationItem.Alumnis.route
                             Alumnis(navController = navController)
+                        }
+                        composable(NavigationItem.AddExperience.route) {
+                            currentPage = NavigationItem.AddExperience.route
+                            AddExperience()
                         }
                     }
                 }

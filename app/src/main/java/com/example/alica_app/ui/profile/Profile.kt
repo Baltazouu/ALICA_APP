@@ -231,7 +231,7 @@ fun ShowProfile(navController: NavController,viewModelProfile: ViewModelProfile,
                 Text(text = "TODO Evenements")
             }
             4 -> {
-                ProfileExperiences()
+                ProfileExperiences(onAddClicked = { navController.navigate(NavigationItem.AddExperience.route) })
             }
             5 -> {
                 ProfileFormations()
