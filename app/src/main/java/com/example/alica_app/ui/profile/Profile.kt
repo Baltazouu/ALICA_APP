@@ -97,8 +97,6 @@ fun Profile(viewModelProfile: ViewModelProfile,navController: NavController) {
 
 
 
-
-
 @Composable
 fun ShowProfile(navController: NavController,viewModelProfile: ViewModelProfile,alumni: Alumni,disconnect:()->Unit = {}) {
 
@@ -173,29 +171,27 @@ fun ShowProfile(navController: NavController,viewModelProfile: ViewModelProfile,
         }
 
 
-        if (page==1) {
+        when (page) {
 
 
-            LazyColumn(
-                Modifier
-                    .fillMaxSize()
-                    ) {
+            1 -> {
+                LazyColumn(
+                    Modifier
+                        .fillMaxSize()
+                ) {
 
-                item{
-                    Column(modifier = Modifier.border(1.dp, Color.Black, RoundedCornerShape(10.dp))
-                    ){
-                        Info(alumni, onClick = {
-                            editProfileLinks = !editProfileLinks
-                        })
-                        if (editProfileLinks) {
-
-
+                    item{
+                        Column(modifier = Modifier.border(1.dp, Color.Black, RoundedCornerShape(10.dp))
+                        ){
+                            Info(alumni, onClick = {
+                                editProfileLinks = !editProfileLinks
+                            })
+                            if (editProfileLinks) {
                                 EditProfileLinks(alumni = alumni, onClick = { updatedGithubURL, updatedLinkedinURL, updatedPortfolioURL,entryYear ->
                                     editProfileLinks = false
 
                                     coroutineScope.launch {
 
-                                        // Mettez à jour les valeurs d'alumni avec les nouvelles valeurs
                                         alumni.githubURL = updatedGithubURL
                                         alumni.linkedinURL = updatedLinkedinURL
                                         alumni.portfolioURL = updatedPortfolioURL
@@ -212,145 +208,39 @@ fun ShowProfile(navController: NavController,viewModelProfile: ViewModelProfile,
                                         }
                                     }
                                 })
+                            }
 
-                        }
+                            if (showErrorProfileLinks) {
+                                Text(text = "Erreur lors de la mise à jour du profil", color = Color.Red)
+                            }
+                            if(showSuccessProfileLinks){
+                                Text(text = "Profil mis à jour avec succès", color = Color.Green)
 
-                        if (showErrorProfileLinks) {
-                            Text(text = "Erreur lors de la mise à jour du profil", color = Color.Red)
-                        }
-                        if(showSuccessProfileLinks){
-                            Text(text = "Profil mis à jour avec succès", color = Color.Green)
+                            }
 
                         }
 
                     }
-
                 }
-
-
-
-
-
-
             }
-        }
-        else if (page==2){
+            2 -> {
 
-            Offers()
-        }
-        else if (page==3){
-            Text(text = "TODO Evenements")
-        }
-        else if (page==4){
-            ProfileExperiences()
-        }
-        else if (page==5){
-            ProfileFormations()
-        }
-    }
-}
-
-@Composable
-fun Offers(){
-    Column(modifier = Modifier
-        .clip(shape = RoundedCornerShape(Dp(15f)))
-        .background(color = Color.LightGray)
-        .padding(Dp(10f))
-        .fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally) {
-        Text(
-            text = "Mes offres :",
-            fontSize = 18.sp,
-            style = TextStyle(textDecoration = TextDecoration.Underline)
-        )
-        LazyColumn {
-            item {
-                OfferDetail()
+                Offers()
             }
-            item {
-                OfferDetail()
+            3 -> {
+                Text(text = "TODO Evenements")
+            }
+            4 -> {
+                ProfileExperiences()
+            }
+            5 -> {
+                ProfileFormations()
             }
         }
     }
 }
 
-@Composable
-fun Info(alumni: Alumni,onClick: () -> Unit = {}){
-    Column(modifier = Modifier
-        .clip(shape = RoundedCornerShape(Dp(15f)))
-        //.background(color = Color.LightGray)
-        .padding(Dp(10f))
-        .fillMaxWidth(),
-        horizontalAlignment = Alignment.Start) {
-        ProfileObject(alumni,onClick = onClick)
-    }
-}
 
-@Composable
-fun ProfileObject(alumni: Alumni,onClick: () -> Unit = {}){
-    Row (
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(20.dp),
-        verticalAlignment = Alignment.CenterVertically)
-    {
-        ProfileImage(alumni.firstName) // Passer en paramètre l'image du profil
-        Spacer(modifier = Modifier.padding(10.dp))
-        ProfileSpecs(alumni.firstName,alumni.lastName,alumni.email) // Passer en paramètre, ou le profil, ou les 3 caractéristique (nom / prenom / metierActuel)
-        ClickableCircleIcon(icon = Icons.Filled.ManageAccounts, onClick = onClick )
-    }
-    ProfileLinks(alumni.linkedinURL ?: "",alumni.githubURL ?: "",alumni.portfolioURL ?: "",alumni.entryYear ?: "")
-}
-
-@Composable
-fun ProfileImage(firstName: String) {
-    Box(modifier = Modifier
-        .clip(shape = CircleShape)
-        .defaultMinSize(60.dp, 60.dp)
-        .background(color = Color.LightGray)) {
-        Text(text = firstName.first().toString(), fontSize = 35.sp,
-            color = Color.Black,
-            modifier = Modifier.padding(start = 18.dp, top = 5.dp)
-        )
-    }
-}
-
-@Composable
-fun ProfileSpecs(firstName:String, lastName:String, email:String){
-    Column {
-        Text(text = "$firstName $lastName")
-        Text(text = email)
-    }
-}
-
-@Composable
-fun ProfileExperiences(){
-    Column (modifier = Modifier
-        .fillMaxWidth()
-        .padding(Dp(10f))){
-        Text(text = "Experiences :",fontSize = 18.sp,
-            style = TextStyle(textDecoration = TextDecoration.Underline))
-        Row {
-            Text(text = "2021-2022 : ")
-            Text(text = "Développeuse chez CGI")
-        }
-    }
-}
-
-@Composable
-fun ProfileFormations(){
-    Column(modifier = Modifier
-        .fillMaxWidth()
-        .padding(Dp(10f))) {
-        Text(text = "Formations :",fontSize = 18.sp,
-            style = TextStyle(textDecoration = TextDecoration.Underline)
-        )
-        Row {
-            Text(text = "2019-2021 : ")
-            Text(text = "BUT Informatique")
-        }
-    }
-}
 
 
 
@@ -374,95 +264,8 @@ val randomAlumni = Alumni(
 )
 
 
-@Composable
-fun ClickableCircleIcon(
-    icon: ImageVector,
-    iconSize: Dp = 24.dp,
-    circleSize: Dp = 48.dp,
-    onClick: () -> Unit
-) {
-    Box(
-        modifier = Modifier
-            .padding(15.dp)
-            .size(circleSize)
-            .clickable(onClick = onClick)
-            .background(Color.Cyan, shape = CircleShape),
-        contentAlignment = Alignment.Center
-    ) {
-        Icon(
-            imageVector = icon,
-            contentDescription = null,
-            tint = Color.Black, // Change color as needed
-            modifier = Modifier.size(iconSize)
-        )
-    }
-}
-
-@Composable
-fun ProfileLinks(linkedin:String, github:String, portfolio:String,entryYear:String){
-    Column(modifier = Modifier
-        .fillMaxWidth()
-        .padding(Dp(10f))) {
-        
-        Text(text = String.format("Année d'entrée : %s",entryYear),fontSize = 18.sp, fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(5.dp))}
-        
-        Text(text = "Liens :",fontSize = 18.sp, fontWeight = FontWeight.Bold,
-
-        )
-        Row(modifier = Modifier.padding(5.dp)) {
-           // Text(text = "2019-2021 : ")
-            Image(modifier = Modifier.width(20.dp),painter = painterResource(id = R.drawable.github), contentDescription = "github" )
-            Spacer(modifier = Modifier.padding(5.dp))
-            Text(text = github)
-        }
-        Row(modifier = Modifier.padding(5.dp)) {
-            Image(modifier = Modifier.width(20.dp),painter = painterResource(id = R.drawable.linkedin), contentDescription = "linkedin" )
-            Spacer(modifier = Modifier.padding(5.dp))
-            Text(text = linkedin)
-        }
-        Row(modifier = Modifier.padding(5.dp)) {
-            Icon(Icons.Filled.Language, contentDescription = "portfolio")
-            //Image(modifier = Modifier.width(20.dp),painter = painterResource(id = R.drawable.linkedin), contentDescription = "linkedin" )
-            Spacer(modifier = Modifier.padding(5.dp))
-            Text(text = portfolio)
-        }
-
-}
 
 
-@Composable
-fun EditProfileLinks(alumni: Alumni,onClick: (String, String, String,String) -> Unit = { _, _, _,_ -> }){
-
-
-    var githubURL by remember { mutableStateOf(alumni.githubURL ?: "") }
-    var linkedinURL by remember { mutableStateOf(alumni.linkedinURL ?: "" ) }
-    var portfolioURL by remember { mutableStateOf(alumni.portfolioURL ?: "" ) }
-    var entryYear by remember { mutableStateOf(alumni.entryYear.toString()) }
-
-    Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(10.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-
-        OutlinedTextField(value = githubURL, onValueChange = {githubURL = it},
-            label = {Text("Github ")})
-
-        OutlinedTextField(value = linkedinURL, onValueChange = { linkedinURL = it},
-                label = {Text("Linkedin ")})
-
-        OutlinedTextField(value = portfolioURL, onValueChange = { portfolioURL = it},
-            label = {Text("Portfolio")})
-
-
-        OutlinedTextField(value = entryYear, onValueChange = {entryYear = it },
-            label = { Text("Année d'entrée") })
-
-        Button(onClick = { onClick(githubURL, linkedinURL, portfolioURL,entryYear) }, modifier = Modifier.width(150.dp)) {
-            Text("Valider")
-        }
-
-
-    }
-
-}
 
 val randomResponse = ResponseAuthentication(
     "",
@@ -479,32 +282,4 @@ fun PreviewProfile() {
     ShowProfile(navController = rememberNavController(),viewModelProfile = ViewModelProfile(
         randomResponse),alumni = randomAlumni)
 }
-
-
-/*
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Preview
-@Composable
-fun PreviewProfile() {
-    val state = rememberDatePickerState(initialDisplayMode = DisplayMode.Input)
-
-    Column(
-        modifier = Modifier.padding(16.dp)
-    ) {
-        EditProfileLinks(alumni = randomAlumni)
-        DatePicker(
-            dateFormatter = DatePickerFormatter("dd/MM/yyyy"),
-            state = state,
-            modifier = Modifier.padding(vertical = 8.dp)
-        )
-
-        Text(
-            "Entered date timestamp: ${state.selectedDateMillis ?: "no input"}",
-            modifier = Modifier.align(Alignment.CenterHorizontally)
-        )
-    }
-}
-*/
-
 
