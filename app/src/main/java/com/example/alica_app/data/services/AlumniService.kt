@@ -7,6 +7,7 @@ import retrofit2.http.Headers
 import com.example.alica_app.data.models.Alumni
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import kotlinx.serialization.json.Json
+import okhttp3.MediaType
 import okhttp3.MediaType.Companion.toMediaType
 import retrofit2.Call
 import retrofit2.Retrofit
@@ -38,5 +39,6 @@ fun createAlumniRetrofit() : Retrofit =
     Retrofit.Builder()
         .baseUrl(Constants.BASE_URL)
         .client(okHttpClient)
-        .addConverterFactory(Json.asConverterFactory("application/json".toMediaType()))
+        .addConverterFactory(Json{ this.ignoreUnknownKeys=true }
+        .asConverterFactory("application/json".toMediaType()))
         .build()

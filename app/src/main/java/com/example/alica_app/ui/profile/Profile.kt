@@ -1,39 +1,17 @@
 package com.example.alica_app.ui.profile
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Language
-import androidx.compose.material.icons.filled.ManageAccounts
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.DatePicker
-import androidx.compose.material3.DatePickerFormatter
-import androidx.compose.material3.DisplayMode
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -44,13 +22,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -58,16 +31,18 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.alica_app.NavigationItem
-import com.example.alica_app.R
 import com.example.alica_app.data.models.Alumni
 import com.example.alica_app.data.models.Link
 import com.example.alica_app.data.models.Links
 import com.example.alica_app.data.models.ResponseAuthentication
-import com.example.alica_app.ui.offers.offerDetail.OfferDetail
+import com.example.alica_app.ui.profile.Experiences.ProfileExperiences
+import com.example.alica_app.ui.profile.Experiences.ViewModelExperience
 import kotlinx.coroutines.launch
 
 @Composable
-fun Profile(viewModelProfile: ViewModelProfile,navController: NavController) {
+fun Profile(viewModelProfile: ViewModelProfile,
+            viewModelExperience: ViewModelExperience,
+            navController: NavController,page:Int = 1) {
     val coroutineScope = rememberCoroutineScope()
     var isLoading by remember { mutableStateOf(true) }
     var alumni by remember { mutableStateOf<Alumni?>(null) }
@@ -87,10 +62,11 @@ fun Profile(viewModelProfile: ViewModelProfile,navController: NavController) {
         if (isLoading) {
             Text(text = "Loading")
         } else {
-            ShowProfile(navController,viewModelProfile,alumni!!,disconnect = {
+            ShowProfile(navController,viewModelProfile,
+                viewModelExperience,alumni = alumni!!,disconnect = {
                 viewModelProfile.disconnect()
                 navController.navigate(NavigationItem.SignIn.route)
-            })
+            }, page = page)
         }
     }
 }
@@ -98,7 +74,10 @@ fun Profile(viewModelProfile: ViewModelProfile,navController: NavController) {
 
 
 @Composable
-fun ShowProfile(navController: NavController,viewModelProfile: ViewModelProfile,alumni: Alumni,disconnect:()->Unit = {}) {
+fun ShowProfile(navController: NavController,viewModelProfile: ViewModelProfile,
+                viewModelExperience: ViewModelExperience,
+                alumni: Alumni,disconnect:()->Unit = {},
+                page:Int = 1) {
 
     val coroutineScope = rememberCoroutineScope()
 
@@ -231,7 +210,7 @@ fun ShowProfile(navController: NavController,viewModelProfile: ViewModelProfile,
                 Text(text = "TODO Evenements")
             }
             4 -> {
-                ProfileExperiences(onAddClicked = { navController.navigate(NavigationItem.AddExperience.route) })
+                ProfileExperiences(viewModelExperience = viewModelExperience,onAddClicked = { navController.navigate(NavigationItem.AddExperience.route) })
             }
             5 -> {
                 ProfileFormations()
@@ -279,7 +258,7 @@ val randomResponse = ResponseAuthentication(
 @Preview
 @Composable
 fun PreviewProfile() {
-    ShowProfile(navController = rememberNavController(),viewModelProfile = ViewModelProfile(
-        randomResponse),alumni = randomAlumni)
+    ShowProfile(navController = rememberNavController(),viewModelProfile = ViewModelProfile(randomResponse),alumni = randomAlumni, viewModelExperience = ViewModelExperience(
+        randomResponse),disconnect = {})
 }
 

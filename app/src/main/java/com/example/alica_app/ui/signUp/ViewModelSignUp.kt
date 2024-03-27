@@ -15,7 +15,7 @@ class ViewModelSignUp : ViewModel() {
 
 
     private val service = createAuthenticationRetrofit().create(AuthenticationService::class.java)
-    val signUpResult = MutableLiveData<Boolean>()
+    private val signUpResult = MutableLiveData<Boolean>()
 
     suspend fun signUp(firstName: String, lastName: String, emailAddress: String, password: String): Boolean {
         return withContext(Dispatchers.IO) {
