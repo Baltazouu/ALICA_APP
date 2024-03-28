@@ -110,7 +110,7 @@ fun ExperienceComponent(experience: Experience,onDeleteClick: ()-> Unit){
             Text(text = experience.startDate + " " + experience.endDate)
             Text(text = experience.title)
         }
-        if(experience.current){
+        if(experience.isCurrent != null && experience.isCurrent){
             Column {
                 CurrentJob()
             }

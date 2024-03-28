@@ -1,7 +1,7 @@
 package com.example.alica_app.ui.profile.experiences
 
 
-import DateInput
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -29,6 +29,7 @@ import com.example.alica_app.data.models.Experience
 import com.example.alica_app.ui.profile.randomResponse
 import com.example.alica_app.ui.utils.DateTextField
 import com.example.alica_app.ui.utils.InputComponent
+import com.example.alica_app.ui.utils.validateDate
 
 
 @Composable
@@ -71,24 +72,32 @@ fun AddExperience(navController: NavController,viewModelExperience: ViewModelExp
                 updateText = { company.value = it }) {}
 
             DateTextField(
-                label = "Date Début",
+                label = "Date Début (jj/mm/aaaa)",
                 onDateChanged = { startDate.value = it }
             )
 
             DateTextField(
-                label = "Date Fin",
+                label = "Date Fin (jj/mm/aaaa)",
                 onDateChanged = { endDate.value = it }
             )
 
 
             Row {
                 Text(text = "Emploi Actuel", modifier = Modifier.padding(10.dp))
-                Switch(checked = currentJob.value, onCheckedChange = { currentJob.value = it})
+                Switch(checked = currentJob.value, onCheckedChange = {
+                    currentJob.value = !currentJob.value
+                    Log.i("Current Job",currentJob.value.toString())
+                })
             }
 
             TextButton(onClick = {
-                viewModelExperience.addExperience(experienceName.value,company.value,startDate.value,endDate.value,currentJob.value)
-                navController.popBackStack()
+
+                Log.i("Date Value Should null",startDate.value)
+
+                if(validateDate(startDate.value).first && validateDate(endDate.value).first){
+                    viewModelExperience.addExperience(experienceName.value,company.value,startDate.value,endDate.value,currentJob.value)
+                    navController.popBackStack()
+                }
             }, modifier = Modifier.padding(10.dp)) {
                 Text(text = "Ajouter")
             }

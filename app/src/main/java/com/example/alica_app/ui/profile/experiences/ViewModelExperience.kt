@@ -12,6 +12,8 @@ import com.example.alica_app.data.services.createExperienceRetrofit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.threeten.bp.LocalDate
+import org.threeten.bp.format.DateTimeFormatter
 import retrofit2.HttpException
 import retrofit2.Response
 import java.text.SimpleDateFormat
@@ -24,7 +26,6 @@ class ViewModelExperience(private val authentication: ResponseAuthentication) : 
     private val service = createExperienceRetrofit().create(ExperiencesService::class.java)
 
     var experiences = MutableLiveData<List<Experience>>(emptyList())
-    //var experiences: List<Experience> = emptyList()
 
     var successDeleteExperience = MutableLiveData(true)
 
@@ -78,15 +79,25 @@ class ViewModelExperience(private val authentication: ResponseAuthentication) : 
         viewModelScope.launch {
             try {
 
+                val inputFormatter = DateTimeFormatter.ofPattern("ddMMyyyy")
+                val outputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'00:00:00.000'Z'")
+
+
+                val newStartDate = LocalDate.parse(startDate, inputFormatter).format(outputFormatter)
+                val newEndDate = LocalDate.parse(endDate, inputFormatter).format(outputFormatter)
+
                 val experience = Experience(
                     id = null,
                     alumniId = authentication.id ?: "",
                     companyName = name,
                     title = title,
-                    startDate = startDate,
-                    endDate = endDate,
-                    current = current
+                    startDate = newStartDate,
+                    endDate = newEndDate,
+                    isCurrent = current
                 )
+
+                Log.i("CURRENT FROM VIEWMODEL", current.toString())
+
                 withContext(Dispatchers.IO) {
 
                     val responseExperience = service.addExperience(String.format("Bearer %s", authentication.token), experience)
