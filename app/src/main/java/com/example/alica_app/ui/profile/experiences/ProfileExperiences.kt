@@ -4,6 +4,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -22,6 +23,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -30,6 +32,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
@@ -40,6 +43,7 @@ import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import androidx.navigation.compose.rememberNavController
 import com.example.alica_app.NavigationItem
+import com.example.alica_app.data.models.Experience
 import com.example.alica_app.ui.profile.randomResponse
 import kotlinx.coroutines.launch
 
@@ -49,14 +53,13 @@ fun ProfileExperiences(viewModelExperience: ViewModelExperience,navController: N
     val coRoutineScope = rememberCoroutineScope()
     var isLoading by remember { mutableStateOf(true) }
 
+    val experiences by viewModelExperience.experiences.observeAsState(emptyList())
+
     LaunchedEffect(Unit) {
         coRoutineScope.launch {
 
-            val result = viewModelExperience.findExperiences()
-
-            if (result) {
-                isLoading = false
-            }
+            viewModelExperience.findExperiences()
+            isLoading = false
         }
     }
 
@@ -81,9 +84,10 @@ fun ProfileExperiences(viewModelExperience: ViewModelExperience,navController: N
                 .fillMaxWidth()
                 .padding(Dp(10f))){
 
-                viewModelExperience.experiences().forEach{
+                experiences.forEach{
                     item {
-                        ExperienceComponent(year = it.startDate, experience = it.title, it.current)
+                        ExperienceComponent(experience = it, onDeleteClick = {
+                            if(it.id != null){viewModelExperience.deleteExperience(it.id)}})
                     }
                 }
             }
@@ -101,23 +105,36 @@ fun PreviewProfileExperiences(onAddClicked: () -> Unit = {}){
 
 
 @Composable
-fun ExperienceComponent(year: String, experience: String,current: Boolean){
+fun ExperienceComponent(experience: Experience,onDeleteClick: ()-> Unit){
 
-    Row(modifier = Modifier.fillMaxWidth(),verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceEvenly) {
-        Column {
-            Text(text = year)
-            Text(text = experience)
-        }
-        if(current){
+    Column() {
+
+        Row(modifier = Modifier.fillMaxWidth(),verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
+
             Column {
-                CurrentJob()
+                Column {
+                    Text(modifier = Modifier.padding(3.dp),text = experience.title,fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                    if(experience.endDate == null){
+                        Text(text = experience.startDate + "-")
+                    }
+                    else{ Text(text = experience.startDate + "-" + experience.endDate) }
+                    Text(text = experience.companyName, fontStyle = FontStyle.Italic)
+                }
+
+            }
+            if(experience.isCurrent != null && experience.isCurrent){
+                Column {
+                    CurrentJob()
+                }
+            }
+            Column {
+                DeleteComponent(onDeleteClick= onDeleteClick)
             }
         }
-        Column {
-            DeleteComponent()
-        }
+        HorizontalDivider(Modifier.padding(5.dp))
+
     }
-    HorizontalDivider(Modifier.padding(5.dp))
+
 
 }
 
@@ -140,10 +157,16 @@ fun CurrentJob() {
 
 @Preview
 @Composable
-fun DeleteComponent(){
-    IconButton(onClick = { /*TODO*/ }) {
+fun DeleteComponent(onDeleteClick: () -> Unit = {}){
+    IconButton(onClick =  onDeleteClick ) {
         Icon(Icons.Outlined.Delete, contentDescription = "delete")
     }
 }
 
 
+
+@Preview
+@Composable
+fun PreviewExperienceComponent(){
+    ExperienceComponent(experience = Experience("1","2020","Développeur FullStack","2021-03-21",null,"QuizzBox Solutions",true),onDeleteClick = {})
+}
