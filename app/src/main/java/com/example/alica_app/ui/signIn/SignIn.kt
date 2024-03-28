@@ -89,7 +89,7 @@ fun SignIn(navController: NavController,
 
                     if (result) {
                         failSignIn = false
-                        authentication.value = viewModelSignIn.signInResponse.value!!
+                         authentication.value = viewModelSignIn.signInResponse.value!!
                         navController.navigate(NavigationItem.Profile.route)
                     } else {
                         failSignIn = true

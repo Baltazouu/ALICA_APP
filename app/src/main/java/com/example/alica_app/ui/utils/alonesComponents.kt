@@ -13,12 +13,14 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.BlurredEdgeTreatment
 import androidx.compose.ui.draw.blur
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.res.colorResource
@@ -185,5 +187,35 @@ fun BackgroundImageWithTitlePreview() {
 @Preview
 @Composable
 fun BackgroundImageWithTitleAndSubTitlePreview() {
-    PreviewNextEvent(topText = "Prochain événement",title = "LASERGAME" , subtitle ="13/04/2024", textButton = "En Savoir Plus", ressource = R.drawable.lasergame, onClick = {})
+    PreviewNextEvent(
+        topText = "Prochain événement",
+        title = "LASERGAME",
+        subtitle = "13/04/2024",
+        textButton = "En Savoir Plus",
+        ressource = R.drawable.lasergame,
+        onClick = {})
 }
+
+@Composable
+fun InputComponent(label:String,
+                   text:String,
+                   updateText:(String) -> Unit,
+                   onFieldTouched: () -> Unit)
+{
+
+    OutlinedTextField(modifier = Modifier
+        .width(280.dp)
+        .onFocusChanged {
+            if (it.isFocused) {
+                onFieldTouched()
+            }
+        },
+        shape = RoundedCornerShape(percent = 20),
+        value = text,
+        onValueChange = updateText,
+        label = { Text(text = label) },
+    )
+
+}
+
+

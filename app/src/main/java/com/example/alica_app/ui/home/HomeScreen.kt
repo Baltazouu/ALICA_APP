@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -34,23 +35,32 @@ import com.example.alica_app.ui.utils.PreviewNextEvent
 @Preview
 @Composable
 fun Home(navController: NavController = rememberNavController()) {
-    Column {
-        BackgroundImageWithTitleAndSubTitle(
-            topText = "le Réseau Alica",
-            title = "Alica Info",
-            subtitle = "te souhaite la bienvenue !",
-            ressource = R.drawable.bandeau
-        )
-
-        PreviewNextEvent(topText = "Prochain événement",title = "LASERGAME" , subtitle ="13/04/2024", textButton = "En Savoir Plus", ressource = R.drawable.lasergame, onClick = {})
-        OurValues()
+    LazyColumn {
+        item {
+            BackgroundImageWithTitleAndSubTitle(
+                topText = "le Réseau Alica",
+                title = "Alica Info",
+                subtitle = "te souhaite la bienvenue !",
+                ressource = R.drawable.bandeau
+            )
+        }
+        item {
+            PreviewNextEvent(topText = "Prochain événement",title = "LASERGAME" , subtitle ="13/04/2024", textButton = "En Savoir Plus", ressource = R.drawable.lasergame, onClick = {})
+        }
+        item {
+             OurValues()
+        }
     }
+
 }
 
 
 @Composable
 fun OurValues() {
-    Row(modifier = Modifier.fillMaxWidth().height(250.dp).background(Color.LightGray)) {
+    Row(modifier = Modifier
+        .fillMaxWidth()
+        .height(250.dp)
+        .background(Color.LightGray)) {
         Column(modifier = Modifier.fillMaxHeight(),verticalArrangement = Arrangement.Center) {
             Image(painter = painterResource(id = R.drawable.coding_friends), contentDescription = "coding friends")
         }

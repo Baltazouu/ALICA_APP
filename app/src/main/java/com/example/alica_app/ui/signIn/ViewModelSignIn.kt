@@ -29,7 +29,7 @@ class ViewModelSignIn : ViewModel() {
 
                         Log.i("CHILD", "Sign in response: ${response.body()}")
                         if (response.isSuccessful) {
-                            Log.i("CHILD", "Sign in successful")
+                            Log.i("CHILD", "Login Successfulll")
                             signInResponse.postValue(response.body())
                             continuation.resume(true)
                         } else {
@@ -39,8 +39,9 @@ class ViewModelSignIn : ViewModel() {
 
                     override fun onFailure(call: retrofit2.Call<ResponseAuthentication>, t: Throwable) {
 
-                        Log.e("CHILD", "Sign in failure", t)
-                        Log.e("CHILD",  t.message,t)
+                        Log.i("CHILD",t.message.toString())
+                        //Log.e("CHILD", "Sign in failure", t)
+                        //Log.e("CHILD",  t.message,t)
                         continuation.resume(false)
                     }
                 })
