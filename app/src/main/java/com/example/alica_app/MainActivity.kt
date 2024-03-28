@@ -21,10 +21,10 @@ import com.example.alica_app.ui.core.TopBar
 import com.example.alica_app.ui.event.events.Events
 import com.example.alica_app.ui.home.Home
 import com.example.alica_app.ui.offers.offerList.Offers
-import com.example.alica_app.ui.profile.Experiences.AddExperience
-import com.example.alica_app.ui.profile.Experiences.ViewModelExperience
 import com.example.alica_app.ui.profile.Profile
 import com.example.alica_app.ui.profile.ViewModelProfile
+import com.example.alica_app.ui.profile.experiences.AddExperience
+import com.example.alica_app.ui.profile.experiences.ViewModelExperience
 import com.example.alica_app.ui.signIn.SignIn
 import com.example.alica_app.ui.signIn.ViewModelSignIn
 import com.example.alica_app.ui.theme.ALICA_APPTheme
@@ -39,31 +39,60 @@ class MainActivity : ComponentActivity() {
             ALICA_APPTheme {
                 sharedPreferences = getSharedPreferences("authentication", Context.MODE_PRIVATE)
 
-                /*authentication = remember {
+                authentication = remember {
                     mutableStateOf(
                         ResponseAuthentication(
                             sharedPreferences.getString("token", "") ?: "",
                             "",
                             "",
-                            "",
-                            "",
-                            emptyList()
-                        )
-                    )
-                }*/
-
-                authentication = remember {
-                    mutableStateOf(
-                        ResponseAuthentication(
-                            "",
-                            "",
-                            "",
-                            "",
-                            "",
+                            sharedPreferences.getString("alumniId", "") ?: "",
+                            sharedPreferences.getString("refreshToken", "") ?:"",
                             emptyList()
                         )
                     )
                 }
+
+
+                LaunchedEffect(Unit) {
+
+                    if(authentication.value.token != ""){
+
+
+                        val refreshTokenManager = RefreshTokenManager()
+
+                        Log.i("REFRESH TOKEN",authentication.value.refreshToken)
+                        Log.i("Alumni Id",authentication.value.id ?: "")
+
+
+                        val result = refreshTokenManager.refresh(authentication.value.refreshToken)
+
+                        if(result){
+
+                            val response = refreshTokenManager.getRefreshResponseAuthentication()
+
+                            //authentication.value.id = response.id
+                            authentication.value.token = response.token
+                           // authentication.value.email = response.email
+                            authentication.value.refreshToken = response.refreshToken
+
+                            Log.i("REFRESH","WORKED")
+
+                        }
+                        else{
+                            authentication.value = ResponseAuthentication(
+                                "",
+                                "",
+                                "",
+                                "",
+                                "",
+                                emptyList()
+                            )
+                            Log.i("REFRESH","FAILED")
+                        }
+                    }
+
+                }
+
 
                 Log.i("token", authentication.value.token)
 
@@ -103,7 +132,7 @@ class MainActivity : ComponentActivity() {
                         composable(NavigationItem.Profile.route) {
                             currentPage = NavigationItem.Profile.route
 
-                            if (authentication.value.token.isEmpty()) {
+                            if (authentication.value.id == null || authentication.value.id  =="") {
                                 navController.navigate(NavigationItem.SignIn.route)
                             }
                             Profile(
@@ -133,6 +162,9 @@ class MainActivity : ComponentActivity() {
 
         with(sharedPreferences.edit()) {
             putString("token", authentication.value.token)
+            putString("email", authentication.value.email)
+            putString("alumniId", authentication.value.id)
+            putString("refreshToken", authentication.value.refreshToken)
             apply()
         }
     }

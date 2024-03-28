@@ -1,8 +1,7 @@
-package com.example.alica_app.ui.profile.Experiences
+package com.example.alica_app.ui.profile.experiences
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
-import com.example.alica_app.data.models.Alumni
 import com.example.alica_app.data.models.Experience
 import com.example.alica_app.data.models.ResponseAuthentication
 import com.example.alica_app.data.services.ExperiencesService

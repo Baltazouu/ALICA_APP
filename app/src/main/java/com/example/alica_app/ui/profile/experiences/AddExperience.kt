@@ -1,4 +1,4 @@
-package com.example.alica_app.ui.profile.Experiences
+package com.example.alica_app.ui.profile.experiences
 
 
 import DateInput

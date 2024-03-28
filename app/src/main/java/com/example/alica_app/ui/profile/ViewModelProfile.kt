@@ -24,7 +24,7 @@ class ViewModelProfile(private var responseAuthentication: ResponseAuthenticatio
 
                 Log.i("Profile token : ",responseAuthentication.token)
 
-                service.getAlumni(responseAuthentication.id, String.format("Bearer %s",responseAuthentication.token))
+                service.getAlumni(responseAuthentication.id ?: "", String.format("Bearer %s",responseAuthentication.token))
                     .enqueue(object : retrofit2.Callback<Alumni> {
                         override fun onResponse(call: retrofit2.Call<Alumni>, response: Response<Alumni>) {
 
@@ -88,6 +88,8 @@ class ViewModelProfile(private var responseAuthentication: ResponseAuthenticatio
 
     fun disconnect() {
         responseAuthentication.token = ""
+        responseAuthentication.id = ""
+        responseAuthentication.email = ""
         alumni = null
     }
 }

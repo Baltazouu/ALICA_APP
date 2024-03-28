@@ -1,4 +1,4 @@
-package com.example.alica_app.ui.profile.Experiences
+package com.example.alica_app.ui.profile.experiences
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
@@ -36,11 +36,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.Navigation
+import androidx.navigation.compose.rememberNavController
+import com.example.alica_app.NavigationItem
 import com.example.alica_app.ui.profile.randomResponse
 import kotlinx.coroutines.launch
 
 @Composable
-fun ProfileExperiences(viewModelExperience: ViewModelExperience,onAddClicked: () -> Unit){
+fun ProfileExperiences(viewModelExperience: ViewModelExperience,navController: NavController){
 
     val coRoutineScope = rememberCoroutineScope()
     var isLoading by remember { mutableStateOf(true) }
@@ -63,10 +67,9 @@ fun ProfileExperiences(viewModelExperience: ViewModelExperience,onAddClicked: ()
             Text(modifier = Modifier.padding(10.dp),text = "Experiences :",fontSize = 18.sp,
                     style = TextStyle(textDecoration = TextDecoration.Underline))
 
-            IconButton(onClick = onAddClicked, colors = IconButtonColors(containerColor = Color.Green, contentColor = Color.Black, disabledContainerColor = Color.Transparent, disabledContentColor = Color.Transparent)) {
+            IconButton(onClick = { navController.navigate(NavigationItem.AddExperience.route) }, colors = IconButtonColors(containerColor = Color.Green, contentColor = Color.Black, disabledContainerColor = Color.Transparent, disabledContentColor = Color.Transparent)) {
                 Icon(Icons.Outlined.Create, contentDescription = "Add Experience")
             }
-
         }
 
         if(isLoading){
@@ -78,7 +81,7 @@ fun ProfileExperiences(viewModelExperience: ViewModelExperience,onAddClicked: ()
                 .fillMaxWidth()
                 .padding(Dp(10f))){
 
-                viewModelExperience.experiences().forEach(){
+                viewModelExperience.experiences().forEach{
                     item {
                         ExperienceComponent(year = it.startDate, experience = it.title, it.current)
                     }
@@ -92,7 +95,8 @@ fun ProfileExperiences(viewModelExperience: ViewModelExperience,onAddClicked: ()
 @Preview
 @Composable
 fun PreviewProfileExperiences(onAddClicked: () -> Unit = {}){
-    ProfileExperiences(viewModelExperience = ViewModelExperience(authentication = randomResponse),onAddClicked = onAddClicked)
+    ProfileExperiences(viewModelExperience = ViewModelExperience(authentication = randomResponse),
+        rememberNavController())
 }
 
 

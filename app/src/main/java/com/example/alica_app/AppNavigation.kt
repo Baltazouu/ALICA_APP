@@ -28,7 +28,6 @@ enum class Screen {
     PROFILE,
     ALUMNIS,
     ADD_EXPERIENCE,
-
 }
 sealed class NavigationItem(val route: String,val icon: ImageVector) {
 

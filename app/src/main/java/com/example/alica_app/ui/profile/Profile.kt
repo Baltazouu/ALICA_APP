@@ -1,6 +1,7 @@
 package com.example.alica_app.ui.profile
 
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -10,6 +11,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -35,14 +37,15 @@ import com.example.alica_app.data.models.Alumni
 import com.example.alica_app.data.models.Link
 import com.example.alica_app.data.models.Links
 import com.example.alica_app.data.models.ResponseAuthentication
-import com.example.alica_app.ui.profile.Experiences.ProfileExperiences
-import com.example.alica_app.ui.profile.Experiences.ViewModelExperience
+import com.example.alica_app.ui.profile.experiences.ProfileExperiences
+import com.example.alica_app.ui.profile.experiences.ViewModelExperience
 import kotlinx.coroutines.launch
 
 @Composable
 fun Profile(viewModelProfile: ViewModelProfile,
             viewModelExperience: ViewModelExperience,
-            navController: NavController,page:Int = 1) {
+            navController: NavController) {
+
     val coroutineScope = rememberCoroutineScope()
     var isLoading by remember { mutableStateOf(true) }
     var alumni by remember { mutableStateOf<Alumni?>(null) }
@@ -58,15 +61,15 @@ fun Profile(viewModelProfile: ViewModelProfile,
         }
     }
 
-    Column {
+    Column(modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
         if (isLoading) {
-            Text(text = "Loading")
+            CircularProgressIndicator()
         } else {
             ShowProfile(navController,viewModelProfile,
                 viewModelExperience,alumni = alumni!!,disconnect = {
                 viewModelProfile.disconnect()
                 navController.navigate(NavigationItem.SignIn.route)
-            }, page = page)
+            })
         }
     }
 }
@@ -76,8 +79,7 @@ fun Profile(viewModelProfile: ViewModelProfile,
 @Composable
 fun ShowProfile(navController: NavController,viewModelProfile: ViewModelProfile,
                 viewModelExperience: ViewModelExperience,
-                alumni: Alumni,disconnect:()->Unit = {},
-                page:Int = 1) {
+                alumni: Alumni,disconnect:()->Unit = {}, ) {
 
     val coroutineScope = rememberCoroutineScope()
 
@@ -151,56 +153,8 @@ fun ShowProfile(navController: NavController,viewModelProfile: ViewModelProfile,
 
 
         when (page) {
-
-
             1 -> {
-                LazyColumn(
-                    Modifier
-                        .fillMaxSize()
-                ) {
-
-                    item{
-                        Column(modifier = Modifier.border(1.dp, Color.Black, RoundedCornerShape(10.dp))
-                        ){
-                            Info(alumni, onClick = {
-                                editProfileLinks = !editProfileLinks
-                            })
-                            if (editProfileLinks) {
-                                EditProfileLinks(alumni = alumni, onClick = { updatedGithubURL, updatedLinkedinURL, updatedPortfolioURL,entryYear ->
-                                    editProfileLinks = false
-
-                                    coroutineScope.launch {
-
-                                        alumni.githubURL = updatedGithubURL
-                                        alumni.linkedinURL = updatedLinkedinURL
-                                        alumni.portfolioURL = updatedPortfolioURL
-                                        alumni.entryYear = entryYear
-
-                                        val result = viewModelProfile.updateProfile(alumni)
-                                        if (result) {
-                                            //navController.navigate(NavigationItem.Profile.route)
-                                            showSuccessProfileLinks = true
-                                            showErrorProfileLinks = false
-                                        } else {
-                                            showErrorProfileLinks = true
-                                            showSuccessProfileLinks = false
-                                        }
-                                    }
-                                })
-                            }
-
-                            if (showErrorProfileLinks) {
-                                Text(text = "Erreur lors de la mise à jour du profil", color = Color.Red)
-                            }
-                            if(showSuccessProfileLinks){
-                                Text(text = "Profil mis à jour avec succès", color = Color.Green)
-
-                            }
-
-                        }
-
-                    }
-                }
+                EditProfileLinks(viewModelProfile = viewModelProfile, alumni = alumni)
             }
             2 -> {
 
@@ -210,7 +164,7 @@ fun ShowProfile(navController: NavController,viewModelProfile: ViewModelProfile,
                 Text(text = "TODO Evenements")
             }
             4 -> {
-                ProfileExperiences(viewModelExperience = viewModelExperience,onAddClicked = { navController.navigate(NavigationItem.AddExperience.route) })
+                ProfileExperiences(viewModelExperience = viewModelExperience,navController = navController)
             }
             5 -> {
                 ProfileFormations()
@@ -254,6 +208,63 @@ val randomResponse = ResponseAuthentication(
     "",
     emptyList()
 )
+
+@Composable
+fun EditProfileLinks(viewModelProfile: ViewModelProfile, alumni: Alumni) {
+
+    val coroutineScope = rememberCoroutineScope()
+    var editProfileLinks by remember { mutableStateOf(false) }
+
+    var showErrorProfileLinks by remember { mutableStateOf(false) }
+    var showSuccessProfileLinks by remember { mutableStateOf(false) }
+
+    LazyColumn(
+        Modifier
+            .fillMaxSize()
+    ) {
+        item {
+            Info(alumni, onClick = {
+                editProfileLinks = !editProfileLinks
+            })
+        }
+        if (editProfileLinks) {
+            item {
+                EditProfileLinks(alumni = alumni, onClick = { updatedGithubURL, updatedLinkedinURL, updatedPortfolioURL, entryYear ->
+                    editProfileLinks = false
+
+                    coroutineScope.launch {
+
+                        alumni.githubURL = updatedGithubURL
+                        alumni.linkedinURL = updatedLinkedinURL
+                        alumni.portfolioURL = updatedPortfolioURL
+                        alumni.entryYear = entryYear
+
+                        val result = viewModelProfile.updateProfile(alumni)
+                        if (result) {
+                            //navController.navigate(NavigationItem.Profile.route)
+                            showSuccessProfileLinks = true
+                            showErrorProfileLinks = false
+                        } else {
+                            showErrorProfileLinks = true
+                            showSuccessProfileLinks = false
+                        }
+                    }
+                })
+            }
+        }
+
+        if (showErrorProfileLinks) {
+            item {
+                Text(text = "Erreur lors de la mise à jour du profil", color = Color.Red)
+            }
+        }
+        if (showSuccessProfileLinks) {
+            item {
+                Text(text = "Profil mis à jour avec succès", color = Color.Green)
+            }
+        }
+    }
+}
 
 @Preview
 @Composable
