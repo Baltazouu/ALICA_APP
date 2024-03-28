@@ -107,7 +107,6 @@ fun EventDetail(){
         Row {
             TextButton(onClick = { /*TODO*/ },) {
                 Text(text = "Je m'inscris !")
-                
             }
         }
     }

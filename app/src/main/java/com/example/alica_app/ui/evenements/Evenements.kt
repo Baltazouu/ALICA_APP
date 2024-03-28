@@ -1,7 +1,9 @@
 package com.example.alica_app.ui.evenements
 
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -19,11 +21,11 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.example.alica_app.R
-
 
 @Composable
 fun Evenements() {
@@ -32,27 +34,30 @@ fun Evenements() {
             .fillMaxWidth()
             .padding(Dp(10f)), horizontalAlignment = Alignment.CenterHorizontally
     ){
-        OneEvent()
-    }
-}
-
-@Composable
-fun OneEvent(){
-    Column {
         Text(
             text = stringResource(R.string.event),
             fontSize = 35.sp,
             textAlign = TextAlign.Center
         )
+        OneEvent()
+        OneEvent()
+        OneEvent()
+    }
+}
+
+@Preview
+@Composable
+fun OneEvent(){
+    Column {
         Row {
             AsyncImage(
                 model = "https://www.mairie-bailly.fr/wp-content/uploads/2023/05/5d4d2f0c0ff89451695087.jpg",
-                contentDescription = "Blabla",
+                contentDescription = "Limage",
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .height(80.dp)
-                    .width(100.dp),
-            )
+                    .height(150.dp)
+                    .width(160.dp),
+                )
+            Spacer(modifier = Modifier.width(20.dp))
             Column {
                 Field(R.string.test_name)
                 Field(R.string.test_city)
@@ -61,10 +66,11 @@ fun OneEvent(){
                 Field(R.string.test_inscrit)
             }
         }
-        Row {
+        Row{
             Button(onClick = { /*TODO*/ }) {
                 Text(text = stringResource(R.string.details))
             }
+            Spacer(modifier = Modifier.width(25.dp))
             Button(onClick = { /*TODO*/ }) {
                 Text(text = stringResource(R.string.inscription))
             }
