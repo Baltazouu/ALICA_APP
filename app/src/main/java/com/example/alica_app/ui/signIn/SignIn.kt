@@ -64,7 +64,7 @@ fun SignIn(navController: NavController,
         verticalArrangement = Arrangement.SpaceBetween) {
 
         BackgroundImageWithTitle("test","Connexion")
-        Text(text = "Connecetez-vous", fontSize = 20.sp)
+        Text(text = "Connectez-vous", fontSize = 20.sp)
 
         InputComponent("Email",email, { email= it },{})
         PasswordTextField(label = "Password", text = password, updateText = { password = it }) {
