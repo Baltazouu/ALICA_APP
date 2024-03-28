@@ -17,7 +17,7 @@ class RefreshTokenManager {
 
    private val authenticationService = createAuthenticationRetrofit().create(AuthenticationService::class.java)
 
-    var responseAuthentication: ResponseAuthentication? = null
+    private var responseAuthentication: ResponseAuthentication? = null
 
     suspend fun refresh(token: String): Boolean {
 
@@ -31,9 +31,6 @@ class RefreshTokenManager {
             catch(ex : HttpException){
                 false
             }
-
-
-
         }
 
 

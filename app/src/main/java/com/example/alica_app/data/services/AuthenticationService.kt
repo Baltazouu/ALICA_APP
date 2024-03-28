@@ -26,7 +26,7 @@ interface AuthenticationService {
     fun signUp(@Body signUpBody: SignUpBody): Call<Unit>
 
     @POST("auth/signIn")
-    fun signIn(@Body signInBody: SignInBody): Call<ResponseAuthentication>
+    suspend fun signIn(@Body signInBody: SignInBody): ResponseAuthentication
     @POST("auth/refresh")
     suspend fun refreshToken(@Body refreshToken: RefreshToken): ResponseAuthentication
 }

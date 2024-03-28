@@ -17,7 +17,7 @@ class ViewModelExperience(private val authentication: ResponseAuthentication) : 
 
     private val service = createExperienceRetrofit().create(ExperiencesService::class.java)
 
-    private var experiences: List<Experience>? = null
+    private var experiences: List<Experience> = emptyList()
 
 
     suspend fun findExperiences(): Boolean {
@@ -29,7 +29,7 @@ class ViewModelExperience(private val authentication: ResponseAuthentication) : 
                         override fun onResponse(call: retrofit2.Call<List<Experience>>, response: Response<List<Experience>>) {
 
                             if (response.isSuccessful) {
-                                experiences = response.body()
+                                experiences = response.body() ?: emptyList()
                                 continuation.resume(true)
                                 Log.i("PROFILE", "Profile response: ${response.body()}")
                             } else {
@@ -76,7 +76,7 @@ class ViewModelExperience(private val authentication: ResponseAuthentication) : 
     }
 
     fun experiences(): List<Experience> {
-        return experiences!!
+        return experiences
     }
 
 }
