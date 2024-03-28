@@ -12,6 +12,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -24,14 +25,24 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.example.alica_app.data.models.Experience
+import com.example.alica_app.ui.profile.randomResponse
+import com.example.alica_app.ui.utils.DateTextField
 import com.example.alica_app.ui.utils.InputComponent
 
 
 @Composable
-fun AddExperience(navController: NavController) {
+fun AddExperience(navController: NavController,viewModelExperience: ViewModelExperience) {
 
     val experienceName = remember { mutableStateOf("") }
     val company = remember { mutableStateOf("") }
+
+    val startDate = remember { mutableStateOf("") }
+    val endDate = remember { mutableStateOf("") }
+
+    val currentJob = remember { mutableStateOf(false) }
+
+
 
     Column(modifier = Modifier.fillMaxSize()) {
         Row(modifier = Modifier.padding(10.dp), horizontalArrangement = Arrangement.Start) {
@@ -59,23 +70,39 @@ fun AddExperience(navController: NavController) {
                 text = company.value,
                 updateText = { company.value = it }) {}
 
-            DateInput(onDateChanged = {}, label = "Date Début")
-            DateInput(onDateChanged = {}, label = "Date Fin")
+            DateTextField(
+                label = "Date Début",
+                onDateChanged = { startDate.value = it }
+            )
 
-            TextButton(onClick = { /*TODO*/ }, modifier = Modifier.padding(10.dp)) {
+            DateTextField(
+                label = "Date Fin",
+                onDateChanged = { endDate.value = it }
+            )
+
+
+            Row {
+                Text(text = "Emploi Actuel", modifier = Modifier.padding(10.dp))
+                Switch(checked = currentJob.value, onCheckedChange = { currentJob.value = it})
+            }
+
+            TextButton(onClick = {
+                viewModelExperience.addExperience(experienceName.value,company.value,startDate.value,endDate.value,currentJob.value)
+                navController.popBackStack()
+            }, modifier = Modifier.padding(10.dp)) {
                 Text(text = "Ajouter")
             }
         }
     }
-
 }
-
 
 
 @Preview
 @Composable
 fun AddExperiencePreview() {
-    AddExperience(navController = rememberNavController())
+    AddExperience(navController = rememberNavController(),viewModelExperience = ViewModelExperience(randomResponse))
 
 }
+
+
 

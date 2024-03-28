@@ -4,11 +4,11 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class Experience(
-    val id : String,
+    val id : String ? = null,
     val alumniId:String,
     val title:String,
-    val startDate:String,
-    val endDate:String,
+    var startDate:String,
+    var endDate:String,
     val companyName:String,
     val current:Boolean,
 ) {}

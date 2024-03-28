@@ -1,8 +1,16 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
+
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDefaults
+import androidx.compose.material3.DatePickerFormatter
+import androidx.compose.material3.DisplayMode
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -13,6 +21,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import java.text.SimpleDateFormat
+import java.time.format.DateTimeFormatter
 import java.util.*
 
 @Composable
@@ -80,3 +89,22 @@ fun formatDate(input: String): String {
 fun PreviewDateInput() {
     DateInput(Modifier.fillMaxWidth(),"Date Début") {}
 }
+
+@Preview
+@Composable
+fun DatePickerTest(){
+
+    DatePicker(state = rememberDatePickerState(),
+        dateFormatter = remember {DatePickerDefaults.dateFormatter() }, title = {
+        DatePickerDefaults.DatePickerHeadline(
+        selectedDateMillis = 0,
+        displayMode = DisplayMode.Picker,
+        dateFormatter = remember {DatePickerDefaults.dateFormatter() },
+        )
+    })
+
+
+
+
+}
+

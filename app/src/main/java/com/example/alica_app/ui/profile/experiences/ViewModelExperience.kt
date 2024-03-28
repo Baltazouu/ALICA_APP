@@ -1,46 +1,56 @@
 package com.example.alica_app.ui.profile.experiences
 
+import android.os.Build
 import android.util.Log
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.alica_app.data.models.Experience
 import com.example.alica_app.data.models.ResponseAuthentication
 import com.example.alica_app.data.services.ExperiencesService
 import com.example.alica_app.data.services.createExperienceRetrofit
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import retrofit2.HttpException
 import retrofit2.Response
+import java.text.SimpleDateFormat
+import java.util.*
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
 class ViewModelExperience(private val authentication: ResponseAuthentication) : ViewModel() {
 
-
     private val service = createExperienceRetrofit().create(ExperiencesService::class.java)
 
-    private var experiences: List<Experience> = emptyList()
+    var experiences = MutableLiveData<List<Experience>>(emptyList())
+    //var experiences: List<Experience> = emptyList()
 
+    var successDeleteExperience = MutableLiveData(true)
 
     suspend fun findExperiences(): Boolean {
         return withContext(Dispatchers.IO) {
             suspendCoroutine { continuation ->
-
                 service.findAlumniExperiences(String.format("Bearer %s", authentication.token))
                     .enqueue(object : retrofit2.Callback<List<Experience>> {
-                        override fun onResponse(call: retrofit2.Call<List<Experience>>, response: Response<List<Experience>>) {
-
+                        override fun onResponse(
+                            call: retrofit2.Call<List<Experience>>,
+                            response: Response<List<Experience>>
+                        ) {
                             if (response.isSuccessful) {
-                                experiences = response.body() ?: emptyList()
+                                experiences.value = response.body() ?: emptyList()
+                                formatExperiences(experiences.value ?: emptyList())
                                 continuation.resume(true)
                                 Log.i("PROFILE", "Profile response: ${response.body()}")
                             } else {
-                                Log.i("PROFILE  FAILED","Profile response: ${response.errorBody()}")
-                                Log.i("PROFILE FAILED",response.toString())
+                                Log.i("PROFILE  FAILED", "Profile response: ${response.errorBody()}")
+                                Log.i("PROFILE FAILED", response.toString())
                                 continuation.resume(false)
                             }
                         }
 
                         override fun onFailure(call: retrofit2.Call<List<Experience>>, t: Throwable) {
-                            Log.e("PROFILE FAILURE",t.message,t)
+                            Log.e("PROFILE FAILURE", t.message, t)
                             continuation.resume(false)
                         }
                     })
@@ -48,35 +58,78 @@ class ViewModelExperience(private val authentication: ResponseAuthentication) : 
         }
     }
 
-    suspend fun addExperience(): Boolean {
-        return withContext(Dispatchers.IO) {
-            suspendCoroutine { continuation ->
+    private fun formatExperiences(experiences: List<Experience>) {
+        val inputFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS", Locale.getDefault())
+        val outputFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
 
-                service.addExperience(String.format("Bearer %s", authentication.token))
-                    .enqueue(object : retrofit2.Callback<Experience> {
-                        override fun onResponse(call: retrofit2.Call<Experience>, response: Response<Experience>) {
-
-                            if (response.isSuccessful) {
-                                continuation.resume(true)
-                                Log.i("PROFILE", "Profile response: ${response.body()}")
-                            } else {
-                                Log.i("PROFILE  FAILED","Profile response: ${response.errorBody()}")
-                                Log.i("PROFILE FAILED",response.toString())
-                                continuation.resume(false)
-                            }
-                        }
-
-                        override fun onFailure(call: retrofit2.Call<Experience>, t: Throwable) {
-                            Log.e("PROFILE FAILURE",t.message,t)
-                            continuation.resume(false)
-                        }
-                    })
+        experiences.forEach { experience ->
+            try {
+                val startDate = inputFormat.parse(experience.startDate)
+                val endDate = inputFormat.parse(experience.endDate)
+                experience.startDate = outputFormat.format(startDate?: Date())
+                experience.endDate = outputFormat.format(endDate?: Date())
+            } catch (e: Exception) {
+                Log.e("PROFILE", "Error parsing dates", e)
             }
         }
     }
 
-    fun experiences(): List<Experience> {
-        return experiences
+    fun addExperience(name: String, title: String, startDate: String, endDate: String, current: Boolean) {
+        viewModelScope.launch {
+            try {
+
+                val experience = Experience(
+                    id = null,
+                    alumniId = authentication.id ?: "",
+                    companyName = name,
+                    title = title,
+                    startDate = startDate,
+                    endDate = endDate,
+                    current = current
+                )
+                withContext(Dispatchers.IO) {
+
+                    val responseExperience = service.addExperience(String.format("Bearer %s", authentication.token), experience)
+                    if (responseExperience.id != null) {
+                        experiences.value?.let { list ->
+                            val updatedList = list.toMutableList()
+                            updatedList.add(responseExperience)
+                            experiences.postValue(updatedList)
+                        }
+                    }
+                }
+            } catch (ex: HttpException) {
+                Log.e("Add Experience", "Error adding experience", ex)
+            }
+        }
     }
+
+
+    fun deleteExperience(id:String){
+        viewModelScope.launch {
+            try {
+                val response = withContext(Dispatchers.IO) {
+                    service.deleteExperience(
+                        String.format("Bearer %s", authentication.token),
+                        id
+                    )
+                }
+                if (response.code() == 204) {
+                    experiences.value?.let { list ->
+                        val updatedList = list.filter { it.id != id }
+                        experiences.postValue(updatedList)
+                    }
+                    successDeleteExperience.postValue(true)
+                } else {
+                    successDeleteExperience.postValue(false)
+                }
+            } catch (ex: HttpException) {
+                Log.e("Delete Experience", "Error deleting experience", ex)
+                successDeleteExperience.postValue(false)
+            }
+        }
+    }
+
+
 
 }

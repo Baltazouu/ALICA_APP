@@ -60,7 +60,7 @@ fun OurValues() {
     Row(modifier = Modifier
         .fillMaxWidth()
         .height(250.dp)
-        .background(Color.LightGray)) {
+        .background(Color.Transparent)) {
         Column(modifier = Modifier.fillMaxHeight(),verticalArrangement = Arrangement.Center) {
             Image(painter = painterResource(id = R.drawable.coding_friends), contentDescription = "coding friends")
         }

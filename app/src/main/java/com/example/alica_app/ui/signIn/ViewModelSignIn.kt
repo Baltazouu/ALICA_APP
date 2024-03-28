@@ -36,7 +36,7 @@ class ViewModelSignIn : ViewModel() {
                     Log.i("RESPONSE","WORKED")
 
                     signInResponse.postValue(response)
-                    failSignIn.postValue(false)               }
+                    failSignIn.postValue(false) }
                 catch (ex: HttpException) {
                     failSignIn.postValue(true)
 

@@ -149,7 +149,7 @@ class MainActivity : ComponentActivity() {
                         }
                         composable(NavigationItem.AddExperience.route) {
                             currentPage = NavigationItem.AddExperience.route
-                            AddExperience(navController)
+                            AddExperience(navController, viewModelExperience = ViewModelExperience(authentication = authentication.value))
                         }
                     }
                 }

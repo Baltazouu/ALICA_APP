@@ -22,6 +22,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -40,6 +41,7 @@ import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import androidx.navigation.compose.rememberNavController
 import com.example.alica_app.NavigationItem
+import com.example.alica_app.data.models.Experience
 import com.example.alica_app.ui.profile.randomResponse
 import kotlinx.coroutines.launch
 
@@ -49,14 +51,13 @@ fun ProfileExperiences(viewModelExperience: ViewModelExperience,navController: N
     val coRoutineScope = rememberCoroutineScope()
     var isLoading by remember { mutableStateOf(true) }
 
+    val experiences by viewModelExperience.experiences.observeAsState(emptyList())
+
     LaunchedEffect(Unit) {
         coRoutineScope.launch {
 
-            val result = viewModelExperience.findExperiences()
-
-            if (result) {
-                isLoading = false
-            }
+            viewModelExperience.findExperiences()
+            isLoading = false
         }
     }
 
@@ -81,9 +82,10 @@ fun ProfileExperiences(viewModelExperience: ViewModelExperience,navController: N
                 .fillMaxWidth()
                 .padding(Dp(10f))){
 
-                viewModelExperience.experiences().forEach{
+                experiences.forEach{
                     item {
-                        ExperienceComponent(year = it.startDate, experience = it.title, it.current)
+                        ExperienceComponent(experience = it, onDeleteClick = {
+                            if(it.id != null){viewModelExperience.deleteExperience(it.id)}})
                     }
                 }
             }
@@ -101,20 +103,20 @@ fun PreviewProfileExperiences(onAddClicked: () -> Unit = {}){
 
 
 @Composable
-fun ExperienceComponent(year: String, experience: String,current: Boolean){
+fun ExperienceComponent(experience: Experience,onDeleteClick: ()-> Unit){
 
-    Row(modifier = Modifier.fillMaxWidth(),verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceEvenly) {
+    Row(modifier = Modifier.fillMaxWidth(),verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
         Column {
-            Text(text = year)
-            Text(text = experience)
+            Text(text = experience.startDate + " " + experience.endDate)
+            Text(text = experience.title)
         }
-        if(current){
+        if(experience.current){
             Column {
                 CurrentJob()
             }
         }
         Column {
-            DeleteComponent()
+            DeleteComponent(onDeleteClick= onDeleteClick)
         }
     }
     HorizontalDivider(Modifier.padding(5.dp))
@@ -140,8 +142,8 @@ fun CurrentJob() {
 
 @Preview
 @Composable
-fun DeleteComponent(){
-    IconButton(onClick = { /*TODO*/ }) {
+fun DeleteComponent(onDeleteClick: () -> Unit = {}){
+    IconButton(onClick =  onDeleteClick ) {
         Icon(Icons.Outlined.Delete, contentDescription = "delete")
     }
 }
