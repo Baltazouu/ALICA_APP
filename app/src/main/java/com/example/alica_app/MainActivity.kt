@@ -19,6 +19,7 @@ import com.example.alica_app.data.models.Role
 import com.example.alica_app.ui.SignUp.SignUpScreen
 import com.example.alica_app.ui.core.NavBar
 import com.example.alica_app.ui.core.TopBar
+import com.example.alica_app.ui.event.eventDetail.EventDetail
 import com.example.alica_app.ui.event.events.Events
 import com.example.alica_app.ui.home.Home
 import com.example.alica_app.ui.offers.offerList.Offers
@@ -71,6 +72,10 @@ class MainActivity : ComponentActivity() {
                         }
                         composable(NavigationItem.Profile.route){
                             Profile(viewModelProfile = ViewModelProfile(authentication.value))
+                        }
+                        composable(NavigationItem.EventDetail.route){
+                            currentPage = NavigationItem.EventDetail.route
+                            EventDetail(navController)
                         }
                     }
                 }

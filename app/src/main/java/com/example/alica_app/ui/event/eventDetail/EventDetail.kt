@@ -20,12 +20,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 
 
 @Preview
 @Composable
-fun EventDetail(){
+fun EventDetail(navController: NavController = rememberNavController()){
 
     Column(modifier = Modifier
         .fillMaxSize()
@@ -40,7 +42,9 @@ fun EventDetail(){
                 contentDescription = "Translated description of what the image contains",
                 modifier = Modifier.fillMaxWidth())
 
-            Column(modifier = Modifier.background(Color.White).padding(5.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+            Column(modifier = Modifier.background(Color.White).padding(5.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
                 Row {
                     Text("LunaPark",textAlign = TextAlign.Center, fontSize = 30.sp)
                 }
