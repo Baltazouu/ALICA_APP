@@ -8,7 +8,8 @@ data class Experience(
     val alumniId:String,
     val title:String,
     var startDate:String,
-    var endDate:String,
+    var endDate:String?,
     val companyName:String,
     val isCurrent:Boolean?,
 ) {}
+

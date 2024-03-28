@@ -25,7 +25,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.example.alica_app.data.models.Experience
 import com.example.alica_app.ui.profile.randomResponse
 import com.example.alica_app.ui.utils.DateTextField
 import com.example.alica_app.ui.utils.InputComponent
@@ -35,7 +34,7 @@ import com.example.alica_app.ui.utils.validateDate
 @Composable
 fun AddExperience(navController: NavController,viewModelExperience: ViewModelExperience) {
 
-    val experienceName = remember { mutableStateOf("") }
+    val jobTitle = remember { mutableStateOf("") }
     val company = remember { mutableStateOf("") }
 
     val startDate = remember { mutableStateOf("") }
@@ -63,8 +62,8 @@ fun AddExperience(navController: NavController,viewModelExperience: ViewModelExp
 
             InputComponent(
                 label = "Poste",
-                text = experienceName.value,
-                updateText = { experienceName.value = it }) {}
+                text = jobTitle.value,
+                updateText = { jobTitle.value = it }) {}
 
             InputComponent(
                 label = "Entreprise",
@@ -77,6 +76,7 @@ fun AddExperience(navController: NavController,viewModelExperience: ViewModelExp
             )
 
             DateTextField(
+                enabled = !currentJob.value,
                 label = "Date Fin (jj/mm/aaaa)",
                 onDateChanged = { endDate.value = it }
             )
@@ -94,8 +94,8 @@ fun AddExperience(navController: NavController,viewModelExperience: ViewModelExp
 
                 Log.i("Date Value Should null",startDate.value)
 
-                if(validateDate(startDate.value).first && validateDate(endDate.value).first){
-                    viewModelExperience.addExperience(experienceName.value,company.value,startDate.value,endDate.value,currentJob.value)
+                if(validateDate(startDate.value).first && validateDate(endDate.value).first || currentJob.value && validateDate(startDate.value).first){
+                    viewModelExperience.addExperience(company.value,jobTitle.value,startDate.value,endDate.value,currentJob.value)
                     navController.popBackStack()
                 }
             }, modifier = Modifier.padding(10.dp)) {

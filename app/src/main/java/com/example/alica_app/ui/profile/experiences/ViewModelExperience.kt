@@ -1,6 +1,5 @@
 package com.example.alica_app.ui.profile.experiences
 
-import android.os.Build
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -66,16 +65,18 @@ class ViewModelExperience(private val authentication: ResponseAuthentication) : 
         experiences.forEach { experience ->
             try {
                 val startDate = inputFormat.parse(experience.startDate)
-                val endDate = inputFormat.parse(experience.endDate)
                 experience.startDate = outputFormat.format(startDate?: Date())
-                experience.endDate = outputFormat.format(endDate?: Date())
+                if(experience.endDate != null){
+                    val endDate = inputFormat.parse(experience.endDate!!)
+                    experience.endDate = outputFormat.format(endDate?: Date())
+                }
             } catch (e: Exception) {
                 Log.e("PROFILE", "Error parsing dates", e)
             }
         }
     }
 
-    fun addExperience(name: String, title: String, startDate: String, endDate: String, current: Boolean) {
+    fun addExperience(company: String, jobTitle: String, startDate: String, endDate: String, current: Boolean) {
         viewModelScope.launch {
             try {
 
@@ -84,13 +85,17 @@ class ViewModelExperience(private val authentication: ResponseAuthentication) : 
 
 
                 val newStartDate = LocalDate.parse(startDate, inputFormatter).format(outputFormatter)
-                val newEndDate = LocalDate.parse(endDate, inputFormatter).format(outputFormatter)
 
+                val newEndDate = if (endDate.isNotEmpty()) {
+                    LocalDate.parse(endDate, inputFormatter).format(outputFormatter)
+                } else {
+                    null
+                }
                 val experience = Experience(
                     id = null,
                     alumniId = authentication.id ?: "",
-                    companyName = name,
-                    title = title,
+                    companyName = company,
+                    title = jobTitle,
                     startDate = newStartDate,
                     endDate = newEndDate,
                     isCurrent = current
@@ -114,6 +119,7 @@ class ViewModelExperience(private val authentication: ResponseAuthentication) : 
             }
         }
     }
+
 
 
     fun deleteExperience(id:String){

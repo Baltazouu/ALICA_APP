@@ -68,6 +68,7 @@ class MaskVisualTransformation(private val mask: String) : VisualTransformation 
 
 @Composable
 fun DateTextField(
+    enabled : Boolean = true,
     label: String = "Date Début",
     onDateChanged: (String) -> Unit = {}
 ) {
@@ -83,7 +84,6 @@ fun DateTextField(
         )
 
         TextField(
-            modifier = Modifier.background(Color.Black),
             value = date,
             onValueChange = { newText ->
                 val (isValidDate, message) = validateDate(newText)
@@ -100,7 +100,8 @@ fun DateTextField(
                 }
             },
             visualTransformation = MaskVisualTransformation(DATE_MASK),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+            enabled = enabled
         )
 
         if (errorMessage.isNotBlank()) {
