@@ -24,6 +24,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.alica_app.NavigationItem
 import com.example.alica_app.R
 
 
@@ -34,7 +35,7 @@ fun Offers(navController: NavController){
         modifier = Modifier.fillMaxWidth()
     ) {
         items(10) {
-            OfferCard()
+            OfferCard(navController)
             Spacer(modifier = Modifier.height(10.dp))
         }
     }
@@ -42,9 +43,8 @@ fun Offers(navController: NavController){
 }
 
 
-@Preview
 @Composable
-fun OfferCard(){
+fun OfferCard(navController: NavController){
     Row(modifier = Modifier
         .fillMaxWidth()
         .height(150.dp)) {
@@ -85,7 +85,10 @@ fun OfferCard(){
             .fillMaxHeight(),verticalArrangement = Arrangement.SpaceEvenly, horizontalAlignment = Alignment.CenterHorizontally) {
             Text(text = "Développeur(euse) ASP .NET", fontSize = 10.sp)
             Text(text = "Stage | Junior", fontSize = 10.sp)
-            Button(onClick = { /*TODO*/ },
+            Button(
+                onClick = { navController.navigate(NavigationItem.OfferDetail.route){
+                    popUpTo(NavigationItem.Offers.route) { inclusive = false }
+                } },
                 modifier = Modifier
                     .height(26.dp)) {
                 Text(fontSize = 8.sp,text = "En savoir plus >")

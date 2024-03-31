@@ -21,6 +21,7 @@ import com.example.alica_app.ui.core.NavBar
 import com.example.alica_app.ui.core.TopBar
 import com.example.alica_app.ui.event.events.Events
 import com.example.alica_app.ui.home.Home
+import com.example.alica_app.ui.offers.offerDetail.OfferDetail
 import com.example.alica_app.ui.offers.offerList.Offers
 import com.example.alica_app.ui.profile.Profile
 import com.example.alica_app.ui.profile.ViewModelProfile
@@ -64,6 +65,10 @@ class MainActivity : ComponentActivity() {
                         composable(NavigationItem.Offers.route) {
                             currentPage = NavigationItem.Offers.route
                             Offers(navController)
+                        }
+                        composable(NavigationItem.OfferDetail.route){
+                            currentPage = NavigationItem.OfferDetail.route
+                            OfferDetail()
                         }
                         composable(NavigationItem.Events.route) {
                             currentPage = NavigationItem.Events.route
