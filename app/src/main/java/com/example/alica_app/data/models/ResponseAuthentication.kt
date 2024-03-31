@@ -5,10 +5,10 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class ResponseAuthentication(
-    val token:String,
+    var token:String,
     val type:String,
-    val email:String,
-    val id: String,
-    val refreshToken:String,
+    var email:String?,
+    var id: String?,
+    var refreshToken:String,
     val role:List<Role>
 ) {}

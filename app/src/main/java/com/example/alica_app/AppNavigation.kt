@@ -1,14 +1,23 @@
 package com.example.alica_app
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.Login
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.AppRegistration
 import androidx.compose.material.icons.filled.Details
 import androidx.compose.material.icons.filled.Event
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Login
-import androidx.compose.material.icons.filled.Navigation
+import androidx.compose.material.icons.filled.VerifiedUser
 import androidx.compose.material.icons.filled.WorkHistory
+import androidx.compose.material.icons.outlined.AccountCircle
+import androidx.compose.material.icons.outlined.AppRegistration
+import androidx.compose.material.icons.outlined.Event
+import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.outlined.Login
+import androidx.compose.material.icons.outlined.VerifiedUser
+import androidx.compose.material.icons.outlined.WorkHistory
+import androidx.compose.material.icons.rounded.WorkHistory
 import androidx.compose.ui.graphics.vector.ImageVector
 
 enum class Screen {
@@ -17,8 +26,9 @@ enum class Screen {
     SIGNUP,
     EVENTS,
     OFFERS,
-    PROFILE
-
+    PROFILE,
+    ALUMNIS,
+    ADD_EXPERIENCE,
 }
 
 enum class Item{
@@ -33,4 +43,6 @@ sealed class NavigationItem(val route: String,val icon: ImageVector) {
     object Offers : NavigationItem(Screen.OFFERS.name,Icons.Filled.WorkHistory)
     object Profile : NavigationItem(Screen.PROFILE.name,Icons.Filled.AccountCircle)
     object OfferDetail : NavigationItem(Item.OFFER_DETAIL.name,Icons.Filled.Details)
+    object Alumnis : NavigationItem(Screen.ALUMNIS.name,Icons.Outlined.VerifiedUser)
+    object AddExperience : NavigationItem(Screen.ADD_EXPERIENCE.name,Icons.Outlined.WorkHistory)
 }

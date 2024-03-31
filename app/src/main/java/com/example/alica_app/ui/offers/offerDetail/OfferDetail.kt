@@ -29,7 +29,7 @@ import com.example.alica_app.ui.utils.BackgroundImageWithTitleAndSubTitle
 @Preview
 @Composable
 fun OfferDetail() {
-    LazyColumn(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.Start) {
+    LazyColumn(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
 
         item {
             BackgroundImageWithTitleAndSubTitle(
@@ -70,11 +70,11 @@ fun OfferDetail() {
             }
         }
     }
-
 }
 
 
-@Preview
+
+
 @Composable
 fun offerSpec(text:String = "TEXT"){
         Text(text = text, modifier = Modifier

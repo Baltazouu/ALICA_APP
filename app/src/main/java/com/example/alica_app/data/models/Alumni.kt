@@ -8,12 +8,12 @@ data class Alumni(
     val id: String,
     val email: String,
     val role: String? = null,
-    val entryYear: Int? = null,
+    var entryYear: String? = null,
     val firstName: String,
     val lastName: String,
-    val linkedinURL: String? = null,
-    val githubURL: String? = null,
-    val portfolioURL: String? = null,
+    var linkedinURL: String? = null,
+    var githubURL: String? = null,
+    var portfolioURL: String? = null,
     val imageId: String? = null,
 
     @SerialName("_links")

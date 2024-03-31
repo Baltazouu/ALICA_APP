@@ -162,7 +162,7 @@ fun SignUpScreen(
 
                         val childResult = channel.receive()
 
-                        if (childResult == true) {
+                        if (childResult) {
                             navController.navigate(NavigationItem.SignIn.route)
                             Log.i("PARENT", "success")
                             showSuccessMessage = true

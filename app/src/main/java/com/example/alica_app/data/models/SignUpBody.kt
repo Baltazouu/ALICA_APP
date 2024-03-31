@@ -21,4 +21,5 @@ data class SignUpBody(
     override fun toString(): String {
         return "SignUpBody(firstName='$firstName', lastName='$lastName', emailAddress='$emailAddress', password='$password')"
     }
+
 }

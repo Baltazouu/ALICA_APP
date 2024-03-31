@@ -12,26 +12,65 @@ import retrofit2.Response
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
-class ViewModelProfile(val responseAuthentication: ResponseAuthentication): ViewModel() {
+class ViewModelProfile(private var responseAuthentication: ResponseAuthentication): ViewModel() {
 
     private val service = createAlumniRetrofit().create(AlumniService::class.java)
+
+    var alumni: Alumni? = null
 
     suspend fun getProfile(): Boolean {
         return withContext(Dispatchers.IO) {
             suspendCoroutine { continuation ->
-                service.getAlumni(responseAuthentication.id, responseAuthentication.token)
+
+                Log.i("Profile token : ",responseAuthentication.token)
+
+                service.getAlumni(responseAuthentication.id ?: "", String.format("Bearer %s",responseAuthentication.token))
                     .enqueue(object : retrofit2.Callback<Alumni> {
                         override fun onResponse(call: retrofit2.Call<Alumni>, response: Response<Alumni>) {
+
+                            Log.i("RESPONSE",response.toString())
+
                             if (response.isSuccessful) {
                                 continuation.resume(true)
-                                Log.i("SUCCESS", "Profile response: ${response.body()}")
+                                alumni = response.body()
+
+                                Log.i("PROFILE", "Profile response: ${response.body()}")
                             } else {
+                                Log.i("PROFILE  FAILED","Profile response: ${response.errorBody()}")
+                                Log.i("PROFILE FAILED",response.toString())
                                 continuation.resume(false)
                             }
                         }
 
                         override fun onFailure(call: retrofit2.Call<Alumni>, t: Throwable) {
-                            Log.e("Error",t.message,t)
+                            Log.e("PROFILE FAILURE",t.message,t)
+                            continuation.resume(false)
+                        }
+                    })
+            }
+        }
+    }
+
+    suspend fun updateProfile(alumni: Alumni): Boolean {
+
+
+        return withContext(Dispatchers.IO) {
+            suspendCoroutine { continuation ->
+                Log.i("PROFILE UPDATE", "before coroutine")
+                service.createAlumni(alumni, String.format("Bearer %s",responseAuthentication.token))
+                    .enqueue(object : retrofit2.Callback<Alumni> {
+                        override fun onResponse(call: retrofit2.Call<Alumni>, response: Response<Alumni>) {
+                            if (response.isSuccessful) {
+                                continuation.resume(true)
+                                Log.i("PROFILE UPDATE", "Profile response: ${response.body()}")
+                            } else {
+                                Log.i("PROFILE UPDATE FAILED","Profile response: ${response.errorBody()}")
+                                continuation.resume(false)
+                            }
+                        }
+
+                        override fun onFailure(call: retrofit2.Call<Alumni>, t: Throwable) {
+                            Log.e("PROFILE FAILURE",t.message,t)
                             continuation.resume(false)
                         }
                     })
@@ -41,5 +80,16 @@ class ViewModelProfile(val responseAuthentication: ResponseAuthentication): View
 
     fun response(): ResponseAuthentication {
         return responseAuthentication
+    }
+
+    fun alumni(): Alumni? {
+        return alumni
+    }
+
+    fun disconnect() {
+        responseAuthentication.token = ""
+        responseAuthentication.id = ""
+        responseAuthentication.email = ""
+        alumni = null
     }
 }

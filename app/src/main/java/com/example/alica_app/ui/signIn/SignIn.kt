@@ -15,8 +15,10 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -47,66 +49,61 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 
 @Composable
-fun SignIn(navController: NavController,
-           viewModelSignIn: ViewModelSignIn = ViewModelSignIn(),
-           authentication: MutableState<ResponseAuthentication>) {
-
+fun SignIn(
+    navController: NavController,
+    viewModelSignIn: ViewModelSignIn,
+    authentication: MutableState<ResponseAuthentication>
+) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-    var failSignIn by remember { mutableStateOf(false) }
 
-    val coroutineScope = rememberCoroutineScope()
+    val signInResponse by viewModelSignIn.signInResponse.observeAsState(null)
+    val failSignIn by viewModelSignIn.failSignIn.observeAsState(false)
 
+    LaunchedEffect(signInResponse) {
+        signInResponse?.let {
 
-    Column(modifier = Modifier.fillMaxSize(),
+            if(signInResponse?.token != ""){
+
+                authentication.value = signInResponse!!
+
+                navController.navigate(NavigationItem.Profile.route)
+            }
+
+        }
+    }
+
+    Column(
+        modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.SpaceBetween) {
-
-        BackgroundImageWithTitle("test","Connexion")
+        verticalArrangement = Arrangement.SpaceBetween
+    ) {
+        BackgroundImageWithTitle("test", "Connexion")
         Text(text = "Connecetez-vous", fontSize = 20.sp)
 
-        InputComponent("Email",email, { email= it },{})
-        PasswordTextField(label = "Password", text = password, updateText = { password = it }) {
-        }
-        if(failSignIn){
+        InputComponent("Email", email, { email = it }) {}
+        PasswordTextField(label = "Password", text = password, updateText = { password = it }) {}
+
+        if (failSignIn) {
             Text(text = "Email ou mot de passe incorrect", color = Color.Red)
         }
+
         Button(
             colors = ButtonDefaults.buttonColors(containerColor = colorResource(id = R.color.alica_blue)),
             onClick = {
-
-                coroutineScope.launch {
-
-                    val channel = Channel<Boolean>()
-
-                    launch {
-                        val signInResult = viewModelSignIn.signIn(email, password)
-                        channel.send(signInResult)
-                    }
-
-                    val result = channel.receive();
-
-                    if (result) {
-                        failSignIn = false
-                        authentication.value = viewModelSignIn.signInResponse.value!!
-                        navController.navigate(NavigationItem.Profile.route)
-                    } else {
-                        failSignIn = true
-                    }
-                }
-
-            }) {
+                viewModelSignIn.signIn(email, password)
+            }
+        ) {
             Text(text = "Connexion")
-            }
+        }
 
-            Text(text = "Pas encore Inscrit ?", fontSize = 18.sp)
-            TextButton(onClick = { navController.navigate(NavigationItem.SignUp.route) }) {
-                Text(text = "S'inscrire", color = colorResource(id = R.color.alica_blue))
-
-            }
-
+        Text(text = "Pas encore Inscrit ?", fontSize = 18.sp)
+        TextButton(onClick = { navController.navigate(NavigationItem.SignUp.route) }) {
+            Text(text = "S'inscrire", color = colorResource(id = R.color.alica_blue))
+        }
     }
 }
+
 
 
 

@@ -1,6 +1,7 @@
 package com.example.alica_app.data.services
 
 import com.example.alica_app.constants.Constants
+import com.example.alica_app.data.models.RefreshToken
 import com.example.alica_app.data.models.ResponseAuthentication
 import com.example.alica_app.data.models.SignInBody
 import com.example.alica_app.data.models.SignUpBody
@@ -13,6 +14,7 @@ import retrofit2.http.POST
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import retrofit2.http.Headers
+import java.util.UUID
 
 val httpClient = OkHttpClient()
 
@@ -24,7 +26,9 @@ interface AuthenticationService {
     fun signUp(@Body signUpBody: SignUpBody): Call<Unit>
 
     @POST("auth/signIn")
-    fun signIn(@Body signInBody: SignInBody): Call<ResponseAuthentication>
+    suspend fun signIn(@Body signInBody: SignInBody): ResponseAuthentication
+    @POST("auth/refresh")
+    suspend fun refreshToken(@Body refreshToken: RefreshToken): ResponseAuthentication
 }
 
 fun createAuthenticationRetrofit(): Retrofit =

@@ -18,7 +18,8 @@ import com.example.alica_app.NavigationItem
 fun NavBar(navController: NavController, ) {
     val items = arrayOf(NavigationItem.Offers,
                         NavigationItem.Home,
-                        NavigationItem.Events)
+                        NavigationItem.Events,
+                        NavigationItem.Alumnis)
     var selectedItem by remember { mutableIntStateOf(1) }
     NavigationBar {
         items.forEachIndexed { index, item ->

@@ -3,12 +3,15 @@ package com.example.alica_app.ui.signIn
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.alica_app.data.models.ResponseAuthentication
 import com.example.alica_app.data.models.SignInBody
 import com.example.alica_app.data.services.AuthenticationService
 import com.example.alica_app.data.services.createAuthenticationRetrofit
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import retrofit2.HttpException
 import retrofit2.Response
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
@@ -17,34 +20,29 @@ class ViewModelSignIn : ViewModel() {
 
     private val service = createAuthenticationRetrofit().create(AuthenticationService::class.java)
 
-    val signInResponse = MutableLiveData<ResponseAuthentication>()
+    val signInResponse = MutableLiveData<ResponseAuthentication?>(null)
 
-    suspend fun signIn(email: String, password: String): Boolean {
-        return withContext(Dispatchers.IO) {
-            val signInBody = SignInBody(email, password)
+    val failSignIn = MutableLiveData<Boolean>(false)
 
-            suspendCoroutine<Boolean> { continuation ->
-                service.signIn(signInBody).enqueue(object : retrofit2.Callback<ResponseAuthentication> {
-                    override fun onResponse(call: retrofit2.Call<ResponseAuthentication>, response: Response<ResponseAuthentication>) {
+    fun signIn(email:String,password:String) {
 
-                        Log.i("CHILD", "Sign in response: ${response.body()}")
-                        if (response.isSuccessful) {
-                            Log.i("CHILD", "Sign in successful")
-                            signInResponse.postValue(response.body())
-                            continuation.resume(true)
-                        } else {
-                            continuation.resume(false)
-                        }
-                    }
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                try {
+                    val signInBody = SignInBody(email, password)
 
-                    override fun onFailure(call: retrofit2.Call<ResponseAuthentication>, t: Throwable) {
+                    val response = service.signIn(signInBody)
 
-                        Log.e("CHILD", "Sign in failure", t)
-                        Log.e("CHILD",  t.message,t)
-                        continuation.resume(false)
-                    }
-                })
+                    Log.i("RESPONSE","WORKED")
+
+                    signInResponse.postValue(response)
+                    failSignIn.postValue(false) }
+                catch (ex: HttpException) {
+                    failSignIn.postValue(true)
+
+                }
             }
         }
     }
+
 }
