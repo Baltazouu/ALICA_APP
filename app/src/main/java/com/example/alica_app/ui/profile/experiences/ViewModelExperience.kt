@@ -11,8 +11,6 @@ import com.example.alica_app.data.services.createExperienceRetrofit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.threeten.bp.LocalDate
-import org.threeten.bp.format.DateTimeFormatter
 import retrofit2.HttpException
 import retrofit2.Response
 import java.text.SimpleDateFormat
@@ -80,16 +78,47 @@ class ViewModelExperience(private val authentication: ResponseAuthentication) : 
         viewModelScope.launch {
             try {
 
-                val inputFormatter = DateTimeFormatter.ofPattern("ddMMyyyy")
-                val outputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'00:00:00.000'Z'")
+                val inputFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS", Locale.getDefault())
 
 
-                val newStartDate = LocalDate.parse(startDate, inputFormatter).format(outputFormatter)
+                val startCalendar: Calendar = Calendar.getInstance()
+                val endCalendar : Calendar= Calendar.getInstance()
+Calendar.JULY
+                Log.i("DATE BEFORE", startDate)
 
-                val newEndDate = if (endDate.isNotEmpty()) {
-                    LocalDate.parse(endDate, inputFormatter).format(outputFormatter)
-                } else {
-                    null
+
+                // Date 23042004
+                // JJMM AAAA
+                startCalendar.set(startDate.substring(4).toInt(), startDate.substring(2, 4).toInt()-1, startDate.substring(0, 2).toInt())
+
+
+                Log.i("MONTH",startDate.substring(2, 4))
+                Log.i("DAY",startDate.substring(0, 2))
+                Log.i("YEAR",startDate.substring(4))
+
+
+                Log.i("MONTH INT",startDate.substring(2, 4).toInt().toString())
+                Log.i("DAY INT",startDate.substring(0, 2).toInt().toString())
+                Log.i("YEAR INT",startDate.substring(4).toInt().toString())
+
+                Log.i("Mois",startCalendar.get(Calendar.MONTH).toString())
+                Log.i("Jour",startCalendar.get(Calendar.DAY_OF_MONTH).toString())
+                Log.i("Année",startCalendar.get(Calendar.YEAR).toString())
+
+                val newStartDate = inputFormat.format(startCalendar.time)
+
+               // 21 03 2004
+
+                Log.i("DATE AFTER", newStartDate)
+
+               // startCalendar.timeInMillis
+                var newEndDate = "";
+
+
+
+                if(endDate.isNotEmpty() && endDate.length == 8) {
+                    endCalendar.set(endDate.substring(4).toInt(), endDate.substring(2, 4).toInt()-1, endDate.substring(0, 2).toInt())
+                    newEndDate = inputFormat.format(endCalendar.time)
                 }
                 val experience = Experience(
                     id = null,
