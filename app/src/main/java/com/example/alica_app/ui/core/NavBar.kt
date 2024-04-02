@@ -10,6 +10,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.navigation.NavController
+import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.alica_app.NavigationItem
 
 
@@ -21,6 +22,12 @@ fun NavBar(navController: NavController, ) {
                         NavigationItem.Events,
                         NavigationItem.Alumnis)
     var selectedItem by remember { mutableIntStateOf(1) }
+
+    var state = navController.currentBackStackEntryAsState()
+    state.value?.destination?.route?.let {
+        selectedItem = items.indexOfFirst { item -> item.route == it }
+    }
+
     NavigationBar {
         items.forEachIndexed { index, item ->
             NavigationBarItem(
