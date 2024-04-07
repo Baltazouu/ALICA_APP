@@ -17,3 +17,13 @@ password : test
 
 Changer le base path de l'application 
 -> constants.Constants.kt (voir code commenté)
+
+
+## Parties fonctionnelles : 
+
+- Connexion/Inscription
+- Modifications infos profil
+- Vues du profil
+- Ajout & suppression formations
+
+- Reste à voir sur les branches....
