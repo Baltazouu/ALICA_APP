@@ -122,7 +122,7 @@ fun ExperienceComponent(experience: Experience,onDeleteClick: ()-> Unit){
                 }
 
             }
-            if(experience.isCurrent != null && experience.isCurrent){
+            if(experience.current != null && experience.current){
                 Column {
                     CurrentJob()
                 }

@@ -10,6 +10,6 @@ data class Experience(
     var startDate:String,
     var endDate:String?,
     val companyName:String,
-    val isCurrent:Boolean?,
+    val current:Boolean?,
 ) {}
 

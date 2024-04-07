@@ -127,7 +127,7 @@ Calendar.JULY
                     title = jobTitle,
                     startDate = newStartDate,
                     endDate = newEndDate,
-                    isCurrent = current
+                    current = current
                 )
 
                 Log.i("CURRENT FROM VIEWMODEL", current.toString())
