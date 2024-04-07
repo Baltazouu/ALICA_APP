@@ -26,10 +26,8 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.alica_app.R
 
-
 @Composable
 fun Offers(navController: NavController){
-    
     LazyColumn(
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -38,9 +36,7 @@ fun Offers(navController: NavController){
             Spacer(modifier = Modifier.height(10.dp))
         }
     }
-
 }
-
 
 @Preview
 @Composable
